@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 428 80" preserveAspectRatio="none">
+  <defs>
+    <!-- Blue gradient for the bar -->
+    <linearGradient id="blueBarGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1E90FF;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#1873CC;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0D4A8C;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- Drop shadow filter -->
+    <filter id="barShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+      <feOffset dx="0" dy="2" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.3"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Rounded rectangle bar -->
+  <rect
+    x="0"
+    y="0"
+    width="428"
+    height="80"
+    rx="16"
+    ry="16"
+    fill="url(#blueBarGradient)"
+    filter="url(#barShadow)"
+  />
+</svg>

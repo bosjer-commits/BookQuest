@@ -1,26 +1,443 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap');
+
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brawl Stars Theme Colors */
+
+  /* Primary Purple/Violet */
+  --primary-purple: #6C5CE7;
+  --primary-purple-light: #A29BFE;
+  --primary-purple-dark: #5B4BC4;
+
+  /* Background Purples */
+  --bg-dark-purple: #2D3561;
+  --bg-deep-navy: #1A1F3A;
+  --bg-darkest: #0F1628;
+  --bg-light-purple: #9B88FF;
+
+  /* Yellow/Gold Accents */
+  --yellow: #FDCB6E;
+  --yellow-bright: #FFA502;
+  --gold: #FFD93D;
+  --gold-light: #FFE66D;
+  --gold-dark: #FFA500;
+
+  /* Pink/Magenta Accents */
+  --pink: #FD79A8;
+  --pink-dark: #E84393;
+  --magenta: #FF6B9D;
+
+  /* Blue/Cyan Accents */
+  --blue: #74B9FF;
+  --blue-bright: #0984E3;
+  --cyan: #6BFFFF;
+
+  /* UI Colors */
+  --white: #FFFFFF;
+  --black: #000000;
+  --success-green: #00B894;
+  --danger-red: #FF3838;
+
+  /* Progress Bar */
+  --progress-blue: #74B9FF;
+  --progress-blue-dark: #0984E3;
+
+  /* Semantic Colors */
+  --background: var(--bg-dark-purple);
+  --foreground: var(--white);
+  --card: var(--bg-deep-navy);
+  --card-border: var(--yellow);
+
+  /* Legacy mappings for compatibility */
+  --navy: var(--bg-deep-navy);
+  --navy-dark: var(--bg-darkest);
+  --navy-light: var(--bg-dark-purple);
+  --parchment: var(--bg-dark-purple);
+  --parchment-dark: var(--bg-deep-navy);
+  --parchment-light: var(--bg-light-purple);
+  --brown: var(--yellow-bright);
+  --brown-text: var(--white);
+  --red-heart: var(--pink);
 }
 
 @theme inline {
+  /* Parchment Colors */
+  --color-parchment: var(--parchment);
+  --color-parchment-dark: var(--parchment-dark);
+  --color-parchment-light: var(--parchment-light);
+  --color-cream: var(--cream);
+
+  /* Navy Colors */
+  --color-navy: var(--navy);
+  --color-navy-dark: var(--navy-dark);
+  --color-navy-light: var(--navy-light);
+
+  /* Gold Colors */
+  --color-gold: var(--gold);
+  --color-gold-light: var(--gold-light);
+  --color-gold-dark: var(--gold-dark);
+  --color-gold-metallic: var(--gold-metallic);
+
+  /* Brown Colors */
+  --color-brown: var(--brown);
+  --color-brown-dark: var(--brown-dark);
+  --color-brown-text: var(--brown-text);
+
+  /* Progress Colors */
+  --color-progress-blue: var(--progress-blue);
+  --color-progress-blue-dark: var(--progress-blue-dark);
+
+  /* Accent Colors */
+  --color-red-heart: var(--red-heart);
+  --color-orange-accent: var(--orange-accent);
+
+  /* Base Colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  /* Font Families */
+  --font-fantasy: 'Cinzel', serif;
+  --font-serif: 'Lora', serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* Spacing Scale (based on mockup analysis) */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+
+  /* Border Radius - Brawl Stars chunky rounded style */
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-full: 9999px;
+
+  /* Shadows - Brawl Stars dramatic 3D shadows */
+  --shadow-sm: 0 4px 8px rgba(0,0,0,0.3);
+  --shadow-md: 0 8px 16px rgba(0,0,0,0.4);
+  --shadow-lg: 0 12px 24px rgba(0,0,0,0.5);
+  --shadow-glow-yellow: 0 0 20px rgba(253,203,110,0.6);
+  --shadow-glow-purple: 0 0 20px rgba(108,92,231,0.6);
+  --shadow-glow-pink: 0 0 20px rgba(253,121,168,0.6);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Brawl Stars vibrant theme */
+body {
+  background-image: url('/assets/background.svg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* Prevent body scroll, app-container handles it */
+}
+
+/* App Container - Main content wrapper */
+.app-container {
+  position: fixed;
+  inset: 0;
+
+  /* Mobile-first: Full screen with minimal padding */
+  margin: 0;
+  padding: 16px;
+  padding-bottom: 0 !important;
+
+  /* Make it scrollable */
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  /* Ensure proper stacking */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Responsive frame sizing */
+@media (min-width: 640px) {
+  .app-container {
+    margin: 16px auto 0 auto;
+    max-width: 428px; /* iPhone 15 Pro Max width */
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@media (min-width: 1024px) {
+  .app-container {
+    margin: 24px auto 0 auto;
+    max-width: 428px;
+  }
+}
+
+/* Custom scrollbar for fantasy feel */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--parchment-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gold);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gold-dark);
+}
+
+/* Utility classes for fantasy theme */
+.fantasy-header {
+  font-family: var(--font-fantasy);
+  font-weight: 700;
+  color: var(--navy);
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+.ornate-frame {
+  border: 3px solid var(--gold);
+  border-radius: 8px;
+  box-shadow:
+    0 4px 6px rgba(0,0,0,0.1),
+    inset 0 0 0 2px var(--brown);
+  background: var(--cream);
+}
+
+.parchment-card {
+  background: linear-gradient(135deg, var(--bg-deep-navy) 0%, var(--bg-darkest) 100%);
+  border: 4px solid var(--yellow);
+  border-radius: 24px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.4), 0 0 0 2px rgba(0,0,0,0.2);
+  position: relative;
+}
+
+.parchment-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(108,92,231,0.1) 0%, transparent 100%);
+  border-radius: 20px;
+  pointer-events: none;
+}
+
+.fantasy-button {
+  background: linear-gradient(to bottom, var(--yellow) 0%, var(--yellow-bright) 100%);
+  color: var(--bg-darkest);
+  font-family: var(--font-sans);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 4px solid var(--white);
+  border-radius: 16px;
+  padding: 14px 28px;
+  box-shadow: 0 6px 0 rgba(0,0,0,0.3), 0 8px 16px rgba(0,0,0,0.4);
+  transition: all 0.1s;
+  cursor: pointer;
+  position: relative;
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+}
+
+.fantasy-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 0 rgba(0,0,0,0.3), 0 10px 20px rgba(0,0,0,0.5), 0 0 20px rgba(253,203,110,0.4);
+}
+
+.fantasy-button:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.4);
+}
+
+.progress-bar-container {
+  background: linear-gradient(to bottom, var(--gold) 0%, var(--gold-dark) 100%);
+  border-radius: 20px;
+  height: 16px;
+  overflow: hidden;
+  border: 1px solid var(--brown);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.progress-bar-fill {
+  background: linear-gradient(to bottom, var(--progress-blue) 0%, var(--progress-blue-dark) 100%);
+  height: 100%;
+  border-radius: 20px;
+  transition: width 0.3s ease;
+  box-shadow: inset 0 1px 2px rgba(255,255,255,0.2);
+}
+
+/* Book Card Styles */
+.book-card {
+  position: relative;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  transition: transform 0.2s;
+}
+
+.book-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.book-card-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.6);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.book-card:hover .book-card-overlay {
+  opacity: 1;
+}
+
+/* Avatar with Gold Border */
+.avatar-gold {
+  border: 3px solid var(--gold);
+  border-radius: 50%;
+  box-shadow:
+    0 2px 8px rgba(0,0,0,0.2),
+    inset 0 0 0 2px var(--navy);
+}
+
+/* Navigation Icon Styles */
+.nav-icon {
+  color: var(--gold);
+  transition: all 0.2s;
+  position: relative;
+}
+
+.nav-icon:hover {
+  animation: shimmer 1.5s infinite;
+}
+
+.nav-icon.active {
+  color: var(--gold-metallic);
+  filter: drop-shadow(0 0 12px rgba(253,203,110,0.9)) drop-shadow(0 0 20px rgba(255,215,0,0.6));
+}
+
+/* Shimmer animation for hover */
+@keyframes shimmer {
+  0% {
+    filter: brightness(1) drop-shadow(0 0 0px transparent);
+  }
+  50% {
+    filter: brightness(1.3) drop-shadow(0 0 15px rgba(253,203,110,0.8));
+  }
+  100% {
+    filter: brightness(1) drop-shadow(0 0 0px transparent);
+  }
+}
+
+/* Star Rating */
+.star-rating {
+  display: flex;
+  gap: 4px;
+}
+
+.star {
+  width: 32px;
+  height: 32px;
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 2;
+  transition: all 0.2s;
+}
+
+.star.filled {
+  fill: var(--gold);
+}
+
+.star:hover {
+  transform: scale(1.1);
+}
+
+/* Brawl Stars Text Styles */
+.brawl-text {
+  font-family: var(--font-sans);
+  font-weight: 900;
+  text-shadow:
+    2px 2px 0 rgba(0,0,0,0.5),
+    -1px -1px 0 rgba(255,255,255,0.1);
+  letter-spacing: 0.5px;
+}
+
+/* Info Button */
+.info-button {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #4A9FFF 0%, #2B7FD9 100%);
+  border: 3px solid white;
+  border-radius: 50%;
+  box-shadow:
+    0 4px 8px rgba(0,0,0,0.3),
+    inset 0 -2px 4px rgba(0,0,0,0.2),
+    inset 0 2px 4px rgba(255,255,255,0.3);
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.info-button:hover {
+  transform: scale(1.1);
+}
+
+.info-button:active {
+  transform: scale(0.95);
+}
+
+/* Year Badge */
+.year-badge {
+  background: linear-gradient(to bottom, #FF8C42 0%, #E67328 100%);
+  border: 3px solid #8B4513;
+  border-radius: 20px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+  padding: 4px 24px;
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+}
+
+/* Ornate Banner (for header) */
+.ornate-banner {
+  background: linear-gradient(to bottom, var(--navy-light) 0%, var(--navy) 50%, var(--navy-dark) 100%);
+  border: 2px solid var(--gold);
+  box-shadow:
+    0 4px 8px rgba(0,0,0,0.3),
+    inset 0 1px 0 rgba(255,255,255,0.1);
+  position: relative;
+}
+
+.ornate-banner::before,
+.ornate-banner::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 0;
+  height: 0;
+  border-style: solid;
+}
+
+.ornate-banner::before {
+  left: -12px;
+  transform: translateY(-50%);
+  border-width: 20px 12px 20px 0;
+  border-color: transparent var(--navy-dark) transparent transparent;
+}
+
+.ornate-banner::after {
+  right: -12px;
+  transform: translateY(-50%);
+  border-width: 20px 0 20px 12px;
+  border-color: transparent transparent transparent var(--navy-dark);
 }

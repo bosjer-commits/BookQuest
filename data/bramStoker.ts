@@ -1,0 +1,17 @@
+export const bramStokerWinners = [
+  { year: 2022, title: "They Stole Our Hearts", author: "Daniel Kraus" },
+  { year: 2022, title: "This Appearing House", author: "Ally Malinenko" },
+  { year: 2022, title: "Camp Scare", author: "Delilah S. Dawson" },
+  { year: 2022, title: "The Clackity", author: "Lora Senf" },
+  { year: 2022, title: "A Comb of Wishes", author: "Lisa Stringfellow" },
+  { year: 2023, title: "The Nighthouse Keeper", author: "Lora Senf" },
+  { year: 2023, title: "Monster Camp", author: "Sarah Henning" },
+  { year: 2023, title: "Los Monstruos: Felice and the Wailing Woman", author: "Diana López" },
+  { year: 2023, title: "Frances and the Werewolves of the Black Forest", author: "Refe Tuma" },
+  { year: 2023, title: "What Stays Buried", author: "Suzanne Young" },
+  { year: 2024, title: "There's Something Sinister in Center Field", author: "Robert P. Ottone" },
+  { year: 2024, title: "The Creepening of Dogwood House", author: "Eden Royce" },
+  { year: 2024, title: "The Curse of Eelgrass Bog", author: "Mary Averling" },
+  { year: 2024, title: "The Witch in the Woods", author: "Michaelbrent Collings" },
+  { year: 2024, title: "The No-Brainer's Guide to Decomposition", author: "Adrianna Cuevas" },
+];

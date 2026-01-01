@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 812" preserveAspectRatio="none">
+  <defs>
+    <!-- Navy to Orange gradient background -->
+    <linearGradient id="backgroundGradient" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a2951;stop-opacity:1" />
+      <stop offset="30%" style="stop-color:#1e3a6b;stop-opacity:1" />
+      <stop offset="60%" style="stop-color:#2b4a7c;stop-opacity:1" />
+      <stop offset="75%" style="stop-color:#8b5a3c;stop-opacity:1" />
+      <stop offset="90%" style="stop-color:#c67342;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e88b4a;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Full page gradient -->
+  <rect
+    x="0"
+    y="0"
+    width="375"
+    height="812"
+    fill="url(#backgroundGradient)"
+  />
+</svg>
