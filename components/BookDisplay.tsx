@@ -26,11 +26,17 @@ export default function BookDisplay({
       {/* Left Arrow */}
       <button
         onClick={onPrevBook}
-        className="w-14 h-14 flex-shrink-0 transition-transform hover:scale-110 active:scale-95"
-        style={{ marginRight: '-10px' }}
+        className="w-14 h-14 flex-shrink-0 transition-transform hover:scale-110 active:scale-95 z-10"
+        style={{ marginRight: '-20px' }}
         aria-label="Previous book"
       >
-        <Image src="/assets/blueleft.png" alt="" width={56} height={56} />
+        <Image
+          src="/assets/blueleft.png"
+          alt=""
+          width={56}
+          height={56}
+          className="w-14 h-14 object-contain"
+        />
       </button>
 
       {/* Book with Frame */}
@@ -79,16 +85,46 @@ export default function BookDisplay({
           />
 
           {/* Year text at bottom of frame */}
-          <div className="absolute bottom-3 left-0 right-0 text-center" style={{ zIndex: 3 }}>
-            <span className="text-white font-bold text-lg brawl-text">{year}</span>
+          <div
+            className="absolute left-0 right-0 flex items-center justify-center gap-2"
+            style={{ bottom: '-4px', zIndex: 3 }}
+          >
+            <span
+              className="text-white text-[20px] font-bold brawl-text relative top-[2px]"
+              style={{
+                textShadow:
+                  '-2px 0 #000, 2px 0 #000, 0 -2px #000, 0 2px #000, -2px -2px #000, 2px -2px #000, -2px 2px #000, 2px 2px #000',
+              }}
+            >
+              *
+            </span>
+            <span
+              className="text-white text-[22px] font-bold brawl-text"
+              style={{
+                textShadow:
+                  '-2px 0 #000, 2px 0 #000, 0 -2px #000, 0 2px #000, -2px -2px #000, 2px -2px #000, -2px 2px #000, 2px 2px #000',
+              }}
+            >
+              {year}
+            </span>
+            <span
+              className="text-white text-[20px] font-bold brawl-text relative top-[2px]"
+              style={{
+                textShadow:
+                  '-2px 0 #000, 2px 0 #000, 0 -2px #000, 0 2px #000, -2px -2px #000, 2px -2px #000, -2px 2px #000, 2px 2px #000',
+              }}
+            >
+              *
+            </span>
           </div>
         </div>
 
         {/* Info Button - positioned at top-right corner */}
         <button
           onClick={onInfoClick}
-          className="absolute -right-3 -top-3 w-10 h-10 transition-transform hover:scale-110 active:scale-95"
+          className="absolute w-10 h-10 transition-transform hover:scale-110 active:scale-95 z-10"
           aria-label="Book information"
+          style={{ right: '8px', top: '8px' }}
         >
           <Image src="/assets/info.png" alt="" width={40} height={40} />
         </button>
@@ -97,11 +133,17 @@ export default function BookDisplay({
       {/* Right Arrow */}
       <button
         onClick={onNextBook}
-        className="w-14 h-14 flex-shrink-0 transition-transform hover:scale-110 active:scale-95"
-        style={{ marginLeft: '-10px' }}
+        className="w-14 h-14 flex-shrink-0 transition-transform hover:scale-110 active:scale-95 z-10"
+        style={{ marginLeft: '-25px' }}
         aria-label="Next book"
       >
-        <Image src="/assets/blueright.png" alt="" width={56} height={56} />
+        <Image
+          src="/assets/blueright.png"
+          alt=""
+          width={56}
+          height={56}
+          className="w-14 h-14 object-contain scale-[0.98]"
+        />
       </button>
     </div>
   );

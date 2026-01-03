@@ -8,7 +8,8 @@ import CategorySelector from '@/components/CategorySelector';
 import BookDisplay from '@/components/BookDisplay';
 import BookInfoSection from '@/components/BookInfoSection';
 import { prizeCategories } from '@/data/categories';
-import { searchBook, getBookCoverUrl } from '@/lib/googleBooks';
+import { searchBook, getBookCoverUrl, fetchOpenLibraryCover } from '@/lib/googleBooks';
+import { getCoverOverrideByIsbn, getCoverOverrideByTitleAuthor } from '@/data/coverOverrides';
 import { useCurrentBook } from '@/contexts/CurrentBookContext';
 import { useFavorites } from '@/contexts/FavoritesContext';
 
@@ -22,6 +23,8 @@ export default function LibraryPage() {
   const [description, setDescription] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
+  const coverCacheKey = 'bookquest_cover_cache_v1';
+  const coverCacheTtlMs = 90 * 24 * 60 * 60 * 1000;
 
   const currentCategory = prizeCategories[categoryIndex];
   const currentBook = currentCategory.books[bookIndex];
@@ -39,6 +42,36 @@ export default function LibraryPage() {
     }
   };
 
+  const getCachedCover = (key: string): string | null => {
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw) as { url: string; ts: number };
+      if (!parsed?.url || !parsed?.ts) return null;
+      if (Date.now() - parsed.ts > coverCacheTtlMs) {
+        localStorage.removeItem(key);
+        return null;
+      }
+      return parsed.url;
+    } catch (error) {
+      console.warn('Cover cache read failed:', error);
+      return null;
+    }
+  };
+
+  const setCachedCover = (key: string, url: string) => {
+    try {
+      localStorage.setItem(key, JSON.stringify({ url, ts: Date.now() }));
+    } catch (error) {
+      console.warn('Cover cache write failed:', error);
+    }
+  };
+
+  const makeTitleAuthorKey = (title: string, author: string) =>
+    `${coverCacheKey}:title:${title.toLowerCase().trim()}|author:${author.toLowerCase().trim()}`;
+  const makeIsbnKey = (isbn: string) =>
+    `${coverCacheKey}:isbn:${isbn.replace(/[^0-9Xx]/g, '').toUpperCase()}`;
+
   // Fetch book cover and description when book changes
   useEffect(() => {
     const fetchBookData = async () => {
@@ -46,12 +79,57 @@ export default function LibraryPage() {
       setCoverUrl(null);
       setDescription(null);
 
+      const titleAuthorKey = makeTitleAuthorKey(currentBook.title, currentBook.author);
+      const overrideTitleAuthor = getCoverOverrideByTitleAuthor(
+        currentBook.title,
+        currentBook.author
+      );
+      if (overrideTitleAuthor) {
+        setCoverUrl(overrideTitleAuthor);
+        setLoading(false);
+        return;
+      }
+      const cachedTitleAuthor = getCachedCover(titleAuthorKey);
+      if (cachedTitleAuthor) {
+        setCoverUrl(cachedTitleAuthor);
+        setLoading(false);
+        return;
+      }
+
       const result = await searchBook(currentBook.title, currentBook.author);
       const url = getBookCoverUrl(result);
 
-      setCoverUrl(url);
+      const isbn = result?.isbn;
+      const overrideIsbn = isbn ? getCoverOverrideByIsbn(isbn) : null;
+      if (isbn) {
+        const cachedIsbn = getCachedCover(makeIsbnKey(isbn));
+        if (cachedIsbn) {
+          setCoverUrl(cachedIsbn);
+          setDescription(result?.description || null);
+          setLoading(false);
+          return;
+        }
+      }
+
+      let finalUrl = overrideIsbn || url;
+      if (!finalUrl) {
+        finalUrl = await fetchOpenLibraryCover(
+          currentBook.title,
+          currentBook.author,
+          isbn
+        );
+      }
+
+      setCoverUrl(finalUrl);
       setDescription(result?.description || null);
       setLoading(false);
+
+      if (finalUrl) {
+        setCachedCover(titleAuthorKey, finalUrl);
+        if (isbn) {
+          setCachedCover(makeIsbnKey(isbn), finalUrl);
+        }
+      }
     };
 
     fetchBookData();
@@ -76,8 +154,11 @@ export default function LibraryPage() {
   };
 
   return (
-    <div className="h-full flex flex-col">
-      <main className="flex-1 flex flex-col items-center justify-start px-4 pt-1 pb-0 space-y-6">
+    <div className="min-h-full flex flex-col">
+      <main
+        className="flex-1 flex flex-col items-center justify-start px-4 pt-0 pb-0 space-y-6"
+        style={{ transform: 'translateY(-24px)', paddingBottom: '96px' }}
+      >
         <CategorySelector
           category={currentCategory}
           bookCount={currentCategory.books.length}
@@ -86,17 +167,24 @@ export default function LibraryPage() {
           onNextCategory={nextCategory}
         />
 
-        <BookDisplay
-          title={currentBook.title}
-          year={currentBook.year}
-          coverUrl={coverUrl}
-          loading={loading}
-          onPrevBook={prevBook}
-          onNextBook={nextBook}
-          onInfoClick={() => setShowInfo(true)}
-        />
+        <div className="flex flex-col items-center space-y-4 -mt-5">
+          <BookDisplay
+            title={currentBook.title}
+            year={currentBook.year}
+            coverUrl={coverUrl}
+            loading={loading}
+            onPrevBook={prevBook}
+            onNextBook={nextBook}
+            onInfoClick={() => setShowInfo(true)}
+          />
 
-        <BookInfoSection author={currentBook.author} title={currentBook.title} />
+          <BookInfoSection
+            author={currentBook.author}
+            title={currentBook.title}
+            isFavorite={isFavorite(currentBook.title)}
+            onToggleFavorite={toggleFavorite}
+          />
+        </div>
       </main>
 
       <BottomNav active="library" />

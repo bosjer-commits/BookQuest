@@ -15,6 +15,8 @@ interface Book {
 interface CurrentBookData {
   book: Book;
   progress: number;
+  currentPage?: number;
+  totalPages?: number;
   coverUrl?: string;
   rating?: number;
 }
@@ -25,6 +27,7 @@ interface CurrentBookContextType {
   finishedBooks: CurrentBookData[];
   setCurrentBook: (book: Book, coverUrl?: string) => void;
   updateProgress: (progress: number) => void;
+  updateReadingProgress: (currentPage: number, totalPages: number) => void;
   updateRating: (rating: number) => void;
   clearCurrentBook: () => void;
   removeInProgressBook: (bookTitle: string) => void;
@@ -108,6 +111,8 @@ export function CurrentBookProvider({ children }: { children: ReactNode }) {
     setCurrentBookState({
       book,
       progress: 0,
+      currentPage: 0,
+      totalPages: 0,
       coverUrl,
       rating: 0
     });
@@ -120,6 +125,19 @@ export function CurrentBookProvider({ children }: { children: ReactNode }) {
         progress: Math.min(100, Math.max(0, progress))
       });
     }
+  };
+
+  const updateReadingProgress = (currentPage: number, totalPages: number) => {
+    if (!currentBook) return;
+    const safeTotal = Math.max(1, totalPages);
+    const safeCurrent = Math.min(Math.max(0, currentPage), safeTotal);
+    const percent = Math.round((safeCurrent / safeTotal) * 100);
+    setCurrentBookState({
+      ...currentBook,
+      currentPage: safeCurrent,
+      totalPages: safeTotal,
+      progress: Math.min(100, Math.max(0, percent))
+    });
   };
 
   const updateRating = (rating: number) => {
@@ -159,7 +177,7 @@ export function CurrentBookProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <CurrentBookContext.Provider value={{ currentBook, inProgressBooks, finishedBooks, setCurrentBook, updateProgress, updateRating, clearCurrentBook, removeInProgressBook, removeFinishedBook }}>
+    <CurrentBookContext.Provider value={{ currentBook, inProgressBooks, finishedBooks, setCurrentBook, updateProgress, updateReadingProgress, updateRating, clearCurrentBook, removeInProgressBook, removeFinishedBook }}>
       {children}
     </CurrentBookContext.Provider>
   );

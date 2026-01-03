@@ -139,6 +139,19 @@ body {
   overflow: hidden; /* Prevent body scroll, app-container handles it */
 }
 
+/* Debug overlay grid (8px). Remove or toggle class to disable. */
+.debug-grid::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.12) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
 /* App Container - Main content wrapper */
 .app-container {
   position: fixed;
@@ -149,8 +162,8 @@ body {
   padding: 16px;
   padding-bottom: 0 !important;
 
-  /* Make it scrollable */
-  overflow-y: auto;
+  /* Prevent scroll for fixed-frame app layout */
+  overflow-y: hidden;
   overflow-x: hidden;
 
   /* Ensure proper stacking */

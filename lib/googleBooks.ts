@@ -3,11 +3,22 @@ export interface GoogleBookResult {
   authors: string[];
   description?: string;
   imageLinks?: {
+    small?: string;
+    medium?: string;
+    large?: string;
+    extraLarge?: string;
     thumbnail?: string;
     smallThumbnail?: string;
   };
   publishedDate?: string;
   isbn?: string;
+}
+
+interface OpenLibrarySearchResult {
+  docs?: Array<{
+    cover_i?: number;
+    isbn?: string[];
+  }>;
 }
 
 export async function searchBook(title: string, author: string): Promise<GoogleBookResult | null> {
@@ -87,20 +98,88 @@ export async function searchBook(title: string, author: string): Promise<GoogleB
 export function getBookCoverUrl(result: GoogleBookResult | null): string | null {
   if (!result?.imageLinks) return null;
 
-  // Prefer larger thumbnail, fall back to small
-  let url = result.imageLinks.thumbnail || result.imageLinks.smallThumbnail || null;
+  // Prefer the largest available image from Google Books.
+  let url =
+    result.imageLinks.extraLarge ||
+    result.imageLinks.large ||
+    result.imageLinks.medium ||
+    result.imageLinks.small ||
+    result.imageLinks.thumbnail ||
+    result.imageLinks.smallThumbnail ||
+    null;
 
   if (!url) return null;
 
   // Ensure HTTPS (Google Books sometimes returns HTTP URLs)
   url = url.replace('http://', 'https://');
 
-  // Remove zoom parameter and request larger image
-  // Default is zoom=1, but we can request zoom=0 for better quality
+  // Remove edge curl effect and request a higher zoom when possible.
   url = url.replace('&edge=curl', ''); // Remove edge curl effect
-  if (!url.includes('zoom=')) {
-    url += '&zoom=0';
+  if (url.includes('zoom=')) {
+    url = url.replace(/zoom=\d+/g, 'zoom=2');
+  } else {
+    url += '&zoom=2';
   }
 
   return url;
+}
+
+function normalizeIsbn(isbn: string): string {
+  return isbn.replace(/[^0-9Xx]/g, '').toUpperCase();
+}
+
+async function isImageAvailable(url: string): Promise<boolean> {
+  try {
+    const head = await fetch(url, { method: 'HEAD' });
+    if (head.ok) return true;
+    const get = await fetch(url);
+    return get.ok;
+  } catch (error) {
+    console.warn('Image check failed:', error);
+    return false;
+  }
+}
+
+export async function fetchOpenLibraryCover(
+  title: string,
+  author: string,
+  isbn?: string
+): Promise<string | null> {
+  try {
+    if (isbn) {
+      const normalized = normalizeIsbn(isbn);
+      const isbnUrl = `https://covers.openlibrary.org/b/isbn/${normalized}-L.jpg`;
+      if (await isImageAvailable(isbnUrl)) {
+        return isbnUrl;
+      }
+    }
+
+    const searchUrl = `https://openlibrary.org/search.json?title=${encodeURIComponent(
+      title
+    )}&author=${encodeURIComponent(author)}&limit=5`;
+    const response = await fetch(searchUrl);
+    if (!response.ok) {
+      console.warn('Open Library search failed:', response.status);
+      return null;
+    }
+
+    const data = (await response.json()) as OpenLibrarySearchResult;
+    const doc = data.docs?.find((d) => d.cover_i) || data.docs?.[0];
+    if (!doc) return null;
+
+    if (doc.cover_i) {
+      return `https://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg`;
+    }
+
+    const docIsbn = doc.isbn?.[0];
+    if (docIsbn) {
+      const normalized = normalizeIsbn(docIsbn);
+      return `https://covers.openlibrary.org/b/isbn/${normalized}-L.jpg`;
+    }
+
+    return null;
+  } catch (error) {
+    console.error('Open Library cover fetch failed:', error);
+    return null;
+  }
 }
