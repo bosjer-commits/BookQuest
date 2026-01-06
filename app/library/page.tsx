@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import BottomNav from '@/components/BottomNav';
@@ -15,6 +16,8 @@ import { useFavorites } from '@/contexts/FavoritesContext';
 
 export default function LibraryPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const didInitFromQuery = useRef(false);
   const { setCurrentBook } = useCurrentBook();
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
   const [categoryIndex, setCategoryIndex] = useState(0);
@@ -134,6 +137,30 @@ export default function LibraryPage() {
 
     fetchBookData();
   }, [bookIndex, currentBook.title, currentBook.author]);
+
+  useEffect(() => {
+    if (didInitFromQuery.current) return;
+    const title = searchParams.get('title');
+    const author = searchParams.get('author');
+    if (!title || !author) return;
+
+    const decodedTitle = decodeURIComponent(title);
+    const decodedAuthor = decodeURIComponent(author);
+
+    for (let i = 0; i < prizeCategories.length; i += 1) {
+      const bookIdx = prizeCategories[i].books.findIndex(
+        (book) =>
+          book.title.toLowerCase() === decodedTitle.toLowerCase() &&
+          book.author.toLowerCase() === decodedAuthor.toLowerCase()
+      );
+      if (bookIdx !== -1) {
+        setCategoryIndex(i);
+        setBookIndex(bookIdx);
+        didInitFromQuery.current = true;
+        break;
+      }
+    }
+  }, [searchParams]);
 
   const nextCategory = () => {
     setCategoryIndex((prev) => (prev + 1) % prizeCategories.length);

@@ -7,146 +7,164 @@ import BottomNav from '@/components/BottomNav';
 import { useFavorites } from '@/contexts/FavoritesContext';
 import { useCurrentBook } from '@/contexts/CurrentBookContext';
 
-interface BookCardProps {
-  book: any;
+type BookItem = {
+  book: {
+    title: string;
+    author: string;
+  };
   coverUrl?: string;
-  onRemove: () => void;
-  onStartReading: () => void;
-  showProgress?: boolean;
-  progress?: number;
+};
+
+function SectionTitle({ title }: { title: string }) {
+  return (
+    <h2
+      className="text-center text-[22px] font-bold brawl-text"
+      style={{
+        color: '#F6D58A',
+        textShadow:
+          '-2px 0 #5A3C12, 2px 0 #5A3C12, 0 -2px #5A3C12, 0 2px #5A3C12',
+      }}
+    >
+      {title}
+    </h2>
+  );
 }
 
-function BookCard({ book, coverUrl, onRemove, onStartReading, showProgress, progress }: BookCardProps) {
+function EmptyFrame({ text, compact }: { text: string; compact?: boolean }) {
   return (
-    <div className="parchment-card p-2 flex-shrink-0" style={{ width: 'calc(33.333% - 8px)' }}>
-      {/* Book Cover */}
-      <div className="w-full aspect-[2/3] bg-navy border-2 border-gold rounded shadow-md overflow-hidden mb-2 relative">
-        {coverUrl ? (
-          <Image
-            src={coverUrl}
-            alt={book.title}
-            fill
-            className="object-cover"
-            unoptimized
-          />
-        ) : (
-          <div className="w-full h-full bg-gradient-to-br from-navy-light to-navy-dark flex items-center justify-center p-2">
-            <div className="text-center">
-              <p className="text-gold text-xs font-bold line-clamp-3">
-                {book.title}
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Remove Heart Button */}
-        <button
-          onClick={onRemove}
-          className="absolute top-1 right-1 w-6 h-6 rounded-full bg-parchment bg-opacity-90 flex items-center justify-center hover:bg-opacity-100 transition-all"
-        >
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="#c41e3a"
-            stroke="#c41e3a"
-            strokeWidth="2"
-          >
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-          </svg>
-        </button>
-      </div>
-
-      {/* Book Info */}
-      <h3 className="text-navy text-xs font-bold line-clamp-2 mb-1">
-        {book.title}
-      </h3>
-      <p className="text-brown-text text-xs line-clamp-1 mb-2">
-        {book.author}
-      </p>
-
-      {/* Progress Bar if applicable */}
-      {showProgress && progress !== undefined && (
-        <div className="progress-bar-container mb-2">
-          <div className="progress-bar-fill" style={{ width: `${progress}%` }} />
-        </div>
+    <div
+      className={`relative w-full mx-auto ${compact ? 'max-w-[320px]' : 'max-w-[320px]'}`}
+      style={compact ? { height: '180px', overflow: 'hidden' } : undefined}
+    >
+      {compact ? (
+        <Image
+          src="/assets/chestframe.png"
+          alt=""
+          width={420}
+          height={200}
+          className="absolute left-1/2 top-1/2 h-[200px] w-[420px] -translate-x-1/2 -translate-y-1/2 object-contain"
+        />
+      ) : (
+        <Image
+          src="/assets/chestframe.png"
+          alt=""
+          width={320}
+          height={200}
+          className="w-full h-auto"
+        />
       )}
-
-      {/* Start Reading Button */}
-      <button
-        onClick={onStartReading}
-        className="w-full py-1.5 bg-navy border border-gold rounded text-gold text-xs hover:bg-navy-light transition-colors"
-      >
-        Start Reading
-      </button>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div
+          className="text-center font-bold brawl-text px-4 text-[18px]"
+          style={{
+            color: '#F6D58A',
+            textShadow:
+              '-2px 0 #5A3C12, 2px 0 #5A3C12, 0 -2px #5A3C12, 0 2px #5A3C12',
+          }}
+        >
+          {text}
+        </div>
+      </div>
     </div>
   );
 }
 
-interface CategorySectionProps {
-  title: string;
-  books: any[];
-  emptyMessage: string;
-  onRemove: (title: string) => void;
-  onStartReading: (book: any, coverUrl?: string) => void;
-  showProgress?: boolean;
+function BookFrame({
+  coverUrl,
+  onClick,
+}: {
+  coverUrl?: string;
+  onClick?: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="relative w-[120px] h-[180px] cursor-pointer"
+    >
+      <div className="absolute inset-[8%] z-[1]">
+        {coverUrl ? (
+          <img
+            src={coverUrl}
+            alt=""
+            className="w-full h-full object-cover rounded block"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center rounded bg-[#2B4E6E]">
+            <span className="text-[28px] font-bold text-[#F6D58A]">+</span>
+          </div>
+        )}
+      </div>
+      <img
+        src="/assets/bookframe.png"
+        alt=""
+        className="absolute inset-0 w-full h-full block pointer-events-none"
+      />
+    </button>
+  );
 }
 
-function CategorySection({ title, books, emptyMessage, onRemove, onStartReading, showProgress }: CategorySectionProps) {
+function SectionGrid({
+  items,
+  onSelect,
+}: {
+  items: BookItem[];
+  onSelect: (item: BookItem) => void;
+}) {
   const [startIndex, setStartIndex] = useState(0);
-  const visibleBooks = books.slice(startIndex, startIndex + 3);
-  const canGoBack = startIndex > 0;
-  const canGoForward = startIndex + 3 < books.length;
+  const visible = items.slice(startIndex, startIndex + 3);
+  const showArrow = items.length > 3;
+  const canGoNext = startIndex + 3 < items.length;
+  const canGoPrev = startIndex > 0;
 
   return (
-    <div className="mb-6">
-      <h2 className="fantasy-header text-lg text-navy mb-3">{title}</h2>
-
-      {books.length === 0 ? (
-        <div className="parchment-card p-4 text-center">
-          <p className="text-brown-text text-sm">{emptyMessage}</p>
-        </div>
-      ) : (
-        <div className="relative">
-          {/* Left Arrow */}
-          {canGoBack && (
-            <button
-              onClick={() => setStartIndex(Math.max(0, startIndex - 3))}
-              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 w-8 h-8 rounded-full bg-navy border-2 border-gold flex items-center justify-center hover:bg-navy-light transition-colors z-10"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gold">
-                <path d="M15 18l-6-6 6-6" />
-              </svg>
-            </button>
-          )}
-
-          {/* Books */}
-          <div className="flex gap-3">
-            {visibleBooks.map((item, index) => (
-              <BookCard
-                key={index}
-                book={showProgress ? item.book : item.book}
-                coverUrl={item.coverUrl}
-                onRemove={() => onRemove(showProgress ? item.book.title : item.book.title)}
-                onStartReading={() => onStartReading(showProgress ? item.book : item.book, item.coverUrl)}
-                showProgress={showProgress}
-                progress={showProgress ? item.progress : undefined}
-              />
-            ))}
+    <div className="relative">
+      <div className="grid grid-cols-3 gap-3 justify-items-center">
+        {visible.map((item, index) => (
+          <div
+            key={index}
+            style={{
+              transform: index === 0 ? 'translateX(-20px)' : index === 2 ? 'translateX(20px)' : 'none'
+            }}
+          >
+            <BookFrame coverUrl={item.coverUrl} onClick={() => onSelect(item)} />
           </div>
+        ))}
+        {visible.length < 3 &&
+          Array.from({ length: 3 - visible.length }).map((_, index) => (
+            <div key={`empty-${index}`} className="w-[120px] h-[180px]" />
+          ))}
+      </div>
 
-          {/* Right Arrow */}
-          {canGoForward && (
-            <button
-              onClick={() => setStartIndex(Math.min(books.length - 3, startIndex + 3))}
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 w-8 h-8 rounded-full bg-navy border-2 border-gold flex items-center justify-center hover:bg-navy-light transition-colors z-10"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gold">
-                <path d="M9 18l6-6-6-6" />
-              </svg>
-            </button>
-          )}
-        </div>
+      {showArrow && (
+        <>
+          <button
+            type="button"
+            onClick={() => {
+              if (!canGoPrev) return;
+              setStartIndex((prev) => Math.max(prev - 3, 0));
+            }}
+            className="absolute left-[-36px] top-1/2 -translate-y-1/2"
+            aria-label="Previous books"
+            disabled={!canGoPrev}
+            style={{ opacity: canGoPrev ? 1 : 0.5 }}
+          >
+            <Image src="/assets/blueleft.png" alt="" width={36} height={36} />
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (!canGoNext) return;
+              setStartIndex((prev) => Math.min(prev + 3, items.length - 3));
+            }}
+            className="absolute right-[-36px] top-1/2 -translate-y-1/2"
+            aria-label="Next books"
+            disabled={!canGoNext}
+            style={{ opacity: canGoNext ? 1 : 0.5 }}
+          >
+            <Image src="/assets/blueright.png" alt="" width={36} height={36} />
+          </button>
+        </>
       )}
     </div>
   );
@@ -154,47 +172,42 @@ function CategorySection({ title, books, emptyMessage, onRemove, onStartReading,
 
 export default function FavoritesPage() {
   const router = useRouter();
-  const { favorites, removeFavorite } = useFavorites();
-  const { inProgressBooks, finishedBooks, setCurrentBook, removeInProgressBook, removeFinishedBook } = useCurrentBook();
+  const { favorites } = useFavorites();
+  const { inProgressBooks, finishedBooks } = useCurrentBook();
 
-  const handleStartReading = (book: any, coverUrl?: string) => {
-    setCurrentBook(book, coverUrl);
-    router.push('/');
+  const isAllEmpty =
+    favorites.length === 0 && inProgressBooks.length === 0 && finishedBooks.length === 0;
+  const emptySectionClass = isAllEmpty ? 'space-y-4' : 'space-y-6';
+
+  const handleSelect = (item: BookItem) => {
+    const title = encodeURIComponent(item.book.title);
+    const author = encodeURIComponent(item.book.author);
+    router.push(`/library?title=${title}&author=${author}`);
   };
 
   return (
-    <div className="h-full flex flex-col">
-      <main className="flex-1 px-6 py-4">
-        <h1 className="fantasy-header text-2xl text-navy mb-6 text-center">Favorites</h1>
+    <div className="min-h-full flex flex-col">
+      <main className={`flex-1 px-6 pt-4 pb-0 ${emptySectionClass}`}>
+        <SectionTitle title="Favorites" />
+        {isAllEmpty ? (
+          <EmptyFrame text="No favourites yet" compact />
+        ) : (
+          <SectionGrid items={favorites} onSelect={handleSelect} />
+        )}
 
-        {/* Favorites Category */}
-        <CategorySection
-          title="Favorited"
-          books={favorites}
-          emptyMessage="No favorites yet. Tap the heart icon in the library to add books."
-          onRemove={removeFavorite}
-          onStartReading={handleStartReading}
-        />
+        <SectionTitle title="In Progress" />
+        {inProgressBooks.length === 0 ? (
+          <EmptyFrame text="No books in progress" compact={isAllEmpty} />
+        ) : (
+          <SectionGrid items={inProgressBooks} onSelect={handleSelect} />
+        )}
 
-        {/* In Progress Category */}
-        <CategorySection
-          title="In Progress"
-          books={inProgressBooks}
-          emptyMessage="No books in progress yet."
-          onRemove={removeInProgressBook}
-          onStartReading={handleStartReading}
-          showProgress={true}
-        />
-
-        {/* Finished Category */}
-        <CategorySection
-          title="Finished"
-          books={finishedBooks}
-          emptyMessage="No finished books yet."
-          onRemove={removeFinishedBook}
-          onStartReading={handleStartReading}
-          showProgress={true}
-        />
+        <SectionTitle title="Finished" />
+        {finishedBooks.length === 0 ? (
+          <EmptyFrame text="No books finished" compact={isAllEmpty} />
+        ) : (
+          <SectionGrid items={finishedBooks} onSelect={handleSelect} />
+        )}
       </main>
 
       <BottomNav active="favorites" />
