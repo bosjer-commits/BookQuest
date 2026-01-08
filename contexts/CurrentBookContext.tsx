@@ -29,6 +29,7 @@ interface CurrentBookContextType {
   updateProgress: (progress: number) => void;
   updateReadingProgress: (currentPage: number, totalPages: number) => void;
   updateRating: (rating: number) => void;
+  finishCurrentBook: (currentPage?: number, totalPages?: number, rating?: number) => void;
   clearCurrentBook: () => void;
   removeInProgressBook: (bookTitle: string) => void;
   removeFinishedBook: (bookTitle: string) => void;
@@ -149,6 +150,37 @@ export function CurrentBookProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const finishCurrentBook = (currentPage?: number, totalPages?: number, rating?: number) => {
+    if (!currentBook) return;
+    const safeTotal = totalPages ? Math.max(1, totalPages) : (currentBook.totalPages || 1);
+    const safeCurrent = currentPage !== undefined
+      ? Math.min(Math.max(0, currentPage), safeTotal)
+      : Math.min(Math.max(0, currentBook.currentPage || 0), safeTotal);
+    const safeRating = rating !== undefined
+      ? Math.min(5, Math.max(0, rating))
+      : Math.min(5, Math.max(0, currentBook.rating || 0));
+    const finishedBook = {
+      ...currentBook,
+      currentPage: safeCurrent,
+      totalPages: safeTotal,
+      progress: 100,
+      rating: safeRating
+    };
+
+    setFinishedBooks((prev) => {
+      const exists = prev.some((b) => b.book.title === finishedBook.book.title);
+      if (exists) {
+        return prev.map((b) =>
+          b.book.title === finishedBook.book.title ? finishedBook : b
+        );
+      }
+      return [...prev, finishedBook];
+    });
+
+    setInProgressBooks((prev) => prev.filter((b) => b.book.title !== finishedBook.book.title));
+    setCurrentBookState(null);
+  };
+
   const clearCurrentBook = () => {
     // Save current book to finished books before clearing
     if (currentBook) {
@@ -177,7 +209,7 @@ export function CurrentBookProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <CurrentBookContext.Provider value={{ currentBook, inProgressBooks, finishedBooks, setCurrentBook, updateProgress, updateReadingProgress, updateRating, clearCurrentBook, removeInProgressBook, removeFinishedBook }}>
+    <CurrentBookContext.Provider value={{ currentBook, inProgressBooks, finishedBooks, setCurrentBook, updateProgress, updateReadingProgress, updateRating, finishCurrentBook, clearCurrentBook, removeInProgressBook, removeFinishedBook }}>
       {children}
     </CurrentBookContext.Provider>
   );

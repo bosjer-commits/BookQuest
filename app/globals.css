@@ -285,6 +285,17 @@ body {
   box-shadow: inset 0 1px 2px rgba(255,255,255,0.2);
 }
 
+.progress-input {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.progress-input::-webkit-outer-spin-button,
+.progress-input::-webkit-inner-spin-button {
+  appearance: none;
+  margin: 0;
+}
+
 /* Book Card Styles */
 .book-card {
   position: relative;

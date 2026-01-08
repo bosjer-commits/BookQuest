@@ -8,13 +8,14 @@ import { useCurrentBook } from '@/contexts/CurrentBookContext';
 
 export default function Home() {
   const router = useRouter();
-  const { currentBook, finishedBooks, updateReadingProgress } = useCurrentBook();
+  const { currentBook, finishedBooks, updateReadingProgress, updateRating, finishCurrentBook } = useCurrentBook();
   const [showProgressEdit, setShowProgressEdit] = useState(false);
   const [currentPage, setCurrentPage] = useState('');
   const [totalPages, setTotalPages] = useState('');
 
   const percent = currentBook?.progress ?? 0;
   const hasCurrentBook = Boolean(currentBook);
+  const rating = currentBook?.rating ?? 0;
   const finishedCount = finishedBooks.length;
   const chestGoals = useMemo(() => [1, 2, 3], []);
 
@@ -80,8 +81,8 @@ export default function Home() {
         </div>
 
         {/* Progress Bar */}
-        <div className="flex items-center gap-3 w-full max-w-[320px] justify-center" style={{ marginTop: '-29px' }}>
-          <div className="w-full max-w-[260px]">
+        <div className="relative w-full max-w-[320px] flex items-center justify-center" style={{ marginTop: '-13px' }}>
+          <div className="w-full max-w-[240px] sm:max-w-[260px]">
             <div className="progress-bar-container">
               <div className="progress-bar-fill" style={{ width: `${percent}%` }} />
             </div>
@@ -93,25 +94,29 @@ export default function Home() {
           </div>
           <button
             onClick={openProgressEdit}
-            className="w-10 h-10 rounded-full border-2 border-gold flex items-center justify-center bg-navy"
+            className="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full border-2 border-gold flex items-center justify-center bg-navy"
             aria-label="Edit progress"
             disabled={!hasCurrentBook}
-            style={{ opacity: hasCurrentBook ? 1 : 0.5 }}
+            style={{
+              opacity: hasCurrentBook ? 1 : 0.5,
+              marginRight: '-18px',
+              marginTop: '-8px'
+            }}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path
-                d="M4 20h4l10.5-10.5-4-4L4 16v4z"
-                stroke="#FFD93D"
-                strokeWidth="2"
-                fill="none"
+                d="M3 17.25V21h3.75l11.06-11.06-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"
+                fill="#FFD93D"
               />
-              <path d="M14.5 5.5l4 4" stroke="#FFD93D" strokeWidth="2" />
             </svg>
           </button>
         </div>
 
         {/* Chest Frame */}
-        <div className="relative w-[calc(100%+64px)] -mx-8 mt-auto z-30">
+        <div
+          className="relative w-[calc(100%+64px)] -mx-8 mt-auto z-30"
+          style={{ marginTop: '-16px' }}
+        >
           <Image
             src="/assets/chestframe.png"
             alt=""
@@ -165,7 +170,7 @@ export default function Home() {
       {/* Progress Edit Modal */}
       {showProgressEdit && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-[var(--navy)] flex items-center justify-center z-50 p-4"
           onClick={() => setShowProgressEdit(false)}
         >
           <div
@@ -173,10 +178,10 @@ export default function Home() {
             onClick={(e) => e.stopPropagation()}
           >
             <Image
-              src="/assets/frame.png"
+              src="/assets/progressbg.png"
               alt=""
               fill
-              className="object-fill"
+              className="object-fill scale-[1.1]"
               sizes="320px"
             />
 
@@ -192,11 +197,7 @@ export default function Home() {
                 Book Progress
               </h3>
 
-              <div className="mt-3 w-full flex items-center justify-center gap-2">
-                <div className="h-[2px] flex-1 bg-gradient-to-r from-transparent via-[#E7C16E] to-transparent" />
-                <div className="w-2 h-2 rounded-full border-2 border-[#E7C16E]" />
-                <div className="h-[2px] flex-1 bg-gradient-to-r from-transparent via-[#E7C16E] to-transparent" />
-              </div>
+              <div className="mt-3 h-4" />
 
               <div className="mt-6 w-full space-y-6">
                 <div className="space-y-2">
@@ -204,13 +205,20 @@ export default function Home() {
                     Current Page
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="flex-1 px-3 py-2 rounded-lg border-2 border-[#D6A75C] bg-[#2B4E6E]">
+                    <div className="relative flex-1 h-[52px]">
+                      <Image
+                        src="/assets/bar2.png"
+                        alt=""
+                        fill
+                        className="object-contain"
+                        sizes="260px"
+                      />
                       <input
                         type="number"
                         min="0"
                         value={currentPage}
                         onChange={(e) => setCurrentPage(e.target.value)}
-                        className="w-full bg-transparent text-center text-[18px] text-[#F6D58A] outline-none"
+                        className="progress-input absolute inset-0 w-full bg-transparent text-center text-[18px] text-[#F6D58A] outline-none"
                         placeholder="0"
                         autoFocus
                       />
@@ -223,13 +231,20 @@ export default function Home() {
                     Total Pages
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="flex-1 px-3 py-2 rounded-lg border-2 border-[#D6A75C] bg-[#2B4E6E]">
+                    <div className="relative flex-1 h-[52px]">
+                      <Image
+                        src="/assets/bar2.png"
+                        alt=""
+                        fill
+                        className="object-contain"
+                        sizes="260px"
+                      />
                       <input
                         type="number"
                         min="1"
                         value={totalPages}
                         onChange={(e) => setTotalPages(e.target.value)}
-                        className="w-full bg-transparent text-center text-[18px] text-[#F6D58A] outline-none"
+                        className="progress-input absolute inset-0 w-full bg-transparent text-center text-[18px] text-[#F6D58A] outline-none"
                         placeholder="0"
                       />
                     </div>
@@ -240,13 +255,15 @@ export default function Home() {
               <div className="mt-6 w-full flex gap-4">
                 <button
                   onClick={() => setShowProgressEdit(false)}
-                  className="flex-1 py-2 text-[16px] font-bold text-[#5A3C12] rounded-full border-2 border-[#F6D58A]"
-                  style={{
-                    background: 'linear-gradient(to bottom, #FBD37C 0%, #E7B354 100%)',
-                    boxShadow: '0 4px 0 rgba(0,0,0,0.2)',
-                  }}
+                  className="flex-1"
                 >
-                  Cancel
+                  <Image
+                    src="/assets/cancel.png"
+                    alt="Cancel"
+                    width={370}
+                    height={133}
+                    className="w-full h-auto"
+                  />
                 </button>
                 <button
                   onClick={() => {
@@ -257,51 +274,65 @@ export default function Home() {
                     }
                     setShowProgressEdit(false);
                   }}
-                  className="flex-1 py-2 text-[16px] font-bold text-[#5A3C12] rounded-full border-2 border-[#F6D58A]"
-                  style={{
-                    background: 'linear-gradient(to bottom, #FBD37C 0%, #E7B354 100%)',
-                    boxShadow: '0 4px 0 rgba(0,0,0,0.2)',
-                  }}
+                  className="flex-1"
                 >
-                  Save
+                  <Image
+                    src="/assets/save.png"
+                    alt="Save"
+                    width={370}
+                    height={133}
+                    className="w-full h-auto"
+                  />
                 </button>
               </div>
 
-              <div className="mt-4 flex items-center justify-center gap-2">
-                {Array.from({ length: 5 }).map((_, index) => (
-                  <svg
-                    key={index}
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                  >
-                    <path
-                      d="M12 3l2.9 6 6.6.5-5 4.2 1.6 6.4-6.1-3.6-6.1 3.6 1.6-6.4-5-4.2 6.6-.5L12 3z"
-                      stroke="#F6D58A"
-                      strokeWidth="2"
-                      fill="transparent"
-                    />
-                  </svg>
-                ))}
+              <div className="mt-4 star-rating justify-center">
+                {Array.from({ length: 5 }).map((_, index) => {
+                  const value = index + 1;
+                  return (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => updateRating(value)}
+                      className="p-0 bg-transparent border-0 cursor-pointer"
+                      aria-label={`Rate ${value} star${value > 1 ? 's' : ''}`}
+                    >
+                      <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        className={`star ${rating >= value ? 'filled' : ''}`}
+                        aria-hidden="true"
+                      >
+                        <path d="M12 3l2.9 6 6.6.5-5 4.2 1.6 6.4-6.1-3.6-6.1 3.6 1.6-6.4-5-4.2 6.6-.5L12 3z" />
+                      </svg>
+                    </button>
+                  );
+                })}
               </div>
 
               <button
                 onClick={() => {
                   const current = parseInt(currentPage, 10);
                   const total = parseInt(totalPages, 10);
-                  if (!Number.isNaN(current) && !Number.isNaN(total) && total > 0) {
-                    updateReadingProgress(current, total);
-                  }
+                  finishCurrentBook(
+                    Number.isNaN(current) ? undefined : current,
+                    Number.isNaN(total) ? undefined : total,
+                    rating
+                  );
                   setShowProgressEdit(false);
                 }}
-                className="mt-4 w-[180px] py-2 text-[16px] font-bold text-[#5A3C12] rounded-full border-2 border-[#F6D58A]"
-                style={{
-                  background: 'linear-gradient(to bottom, #FBD37C 0%, #E7B354 100%)',
-                  boxShadow: '0 4px 0 rgba(0,0,0,0.2)',
-                }}
+                className="mt-4 w-[180px]"
+                disabled={rating < 1}
+                style={{ opacity: rating < 1 ? 0.5 : 1 }}
               >
-                Finished!
+                <Image
+                  src="/assets/finished.png"
+                  alt="Finished"
+                  width={474}
+                  height={156}
+                  className="w-full h-auto"
+                />
               </button>
             </div>
           </div>

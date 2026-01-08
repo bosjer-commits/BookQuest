@@ -219,60 +219,88 @@ export default function LibraryPage() {
       {/* Info Overlay */}
       {showInfo && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-[var(--navy)] flex items-center justify-center z-50 p-4"
           onClick={() => setShowInfo(false)}
         >
           <div
-            className="parchment-card p-6 w-full max-w-sm max-h-[70vh] overflow-y-auto"
+            className="relative w-[320px] h-[520px]"
             onClick={(e) => e.stopPropagation()}
-            style={{ minWidth: '300px' }}
           >
-            <div className="flex justify-between items-start mb-4">
-              <h3 className="fantasy-header text-lg text-navy pr-8">{currentBook.title}</h3>
-              <button
-                onClick={() => setShowInfo(false)}
-                className="w-8 h-8 rounded-full bg-navy border border-gold flex items-center justify-center hover:bg-navy-light transition-colors flex-shrink-0"
-              >
-                <span className="text-gold text-lg">×</span>
-              </button>
-            </div>
-
-            <p className="text-sm text-brown-text mb-2">
-              <strong>Author:</strong> {currentBook.author}
-            </p>
-            <p className="text-sm text-brown-text mb-2">
-              <strong>Year:</strong> {currentBook.year}
-            </p>
-            {currentBook.ageRange && (
-              <p className="text-sm text-brown-text mb-4">
-                <strong>Age Range:</strong> {currentBook.ageRange}
-              </p>
-            )}
-
-            {currentBook.summary ? (
-              <div className="text-sm text-brown-text leading-relaxed mb-4">
-                <strong>Summary:</strong>
-                <p className="mt-2">{currentBook.summary}</p>
-              </div>
-            ) : description ? (
-              <div className="text-sm text-brown-text leading-relaxed mb-4">
-                <strong>Description:</strong>
-                <p className="mt-2">
-                  {description.length > 300
-                    ? description.substring(0, 300) + '...'
-                    : description}
-                </p>
-              </div>
-            ) : (
-              <p className="text-sm text-brown-text italic mb-4">No description available.</p>
-            )}
+            <Image
+              src="/assets/infobg.png"
+              alt=""
+              fill
+              className="object-fill scale-[1.1] pointer-events-none"
+              sizes="320px"
+            />
 
             <button
-              onClick={handleStartReading}
-              className="w-full py-3 bg-navy border-2 border-gold rounded text-gold font-bold hover:bg-navy-light transition-colors"
+              onClick={() => setShowInfo(false)}
+              className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full border-2 border-[#E5C26B] text-[#E5C26B] text-lg leading-none flex items-center justify-center bg-[#2B4E6E]"
+              aria-label="Close info"
             >
-              Start Reading
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path
+                  d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                  fill="#E5C26B"
+                />
+              </svg>
             </button>
+
+            <div className="absolute inset-0 px-6 py-10 flex flex-col items-center text-center">
+              <div className="w-full flex-1 flex flex-col items-center">
+                <h3
+                  className="text-[26px] font-bold brawl-text"
+                  style={{
+                    color: '#F6D58A',
+                    textShadow:
+                      '-2px 0 #5A3C12, 2px 0 #5A3C12, 0 -2px #5A3C12, 0 2px #5A3C12',
+                  }}
+                >
+                  {currentBook.title}
+                </h3>
+
+                <div className="mt-3 space-y-1 text-[16px] font-bold text-[#F6D58A] brawl-text">
+                  <div>Author: {currentBook.author}</div>
+                  <div>Year: {currentBook.year}</div>
+                  {currentBook.ageRange && <div>Age Range: {currentBook.ageRange}</div>}
+                </div>
+
+                <div className="relative mt-[60px] w-full flex-1 flex items-center justify-center">
+                <Image
+                  src="/assets/infobox.png"
+                  alt=""
+                  fill
+                  className="object-contain scale-[1.1] pointer-events-none"
+                  sizes="280px"
+                />
+                  <div className="absolute inset-[32px] flex items-center justify-center text-center">
+                    <div className="w-full max-h-full text-[14px] text-[#F6D58A] leading-relaxed overflow-y-auto">
+                      {currentBook.summary
+                        ? currentBook.summary
+                        : description
+                          ? description.length > 300
+                            ? description.substring(0, 300) + '...'
+                            : description
+                          : 'No description available.'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <button onClick={handleStartReading} className="mt-4 w-[200px] relative">
+                <Image
+                  src="/assets/start.png"
+                  alt="Start Reading"
+                  width={1187}
+                  height={295}
+                  className="w-full h-auto"
+                />
+                <span className="absolute inset-0 flex items-center justify-center text-[18px] font-bold text-[#5A3C12]">
+                  Read
+                </span>
+              </button>
+            </div>
           </div>
         </div>
       )}
