@@ -25,7 +25,8 @@ export const bramStokerWinners = [
     title: "The Clackity",
     author: "Lora Senf",
     ageRange: "Age 10–13",
-    summary: "A girl enters a nightmarish world to save her aunt. Inspired by folklore and dark fairy tales. Intense and genuinely creepy, best for confident readers."
+    summary: "A girl enters a nightmarish world to save her aunt. Inspired by folklore and dark fairy tales. Intense and genuinely creepy, best for confident readers.",
+    cover: "/covers/Bram Stoker/the-clackity.jpg"
   },
   {
     year: 2022,
@@ -39,14 +40,16 @@ export const bramStokerWinners = [
     title: "The Nighthouse Keeper",
     author: "Lora Senf",
     ageRange: "Age 11–14",
-    summary: "A mysterious guardian protects a house that should not exist. Reality bends as shadows and monsters emerge. Dark, atmospheric, and best for older middle grade readers."
+    summary: "A mysterious guardian protects a house that should not exist. Reality bends as shadows and monsters emerge. Dark, atmospheric, and best for older middle grade readers.",
+    cover: "/covers/Bram Stoker/the-nighthouse-keeper.jpg"
   },
   {
     year: 2023,
     title: "Monster Camp",
     author: "Sarah Henning",
     ageRange: "Age 9–12",
-    summary: "A camp for kids who are secretly monsters. Explores identity and belonging with humor. Fun, spooky, and approachable."
+    summary: "A camp for kids who are secretly monsters. Explores identity and belonging with humor. Fun, spooky, and approachable.",
+    cover: "/covers/Bram Stoker/monster-camp.jpg"
   },
   {
     year: 2023,
@@ -74,7 +77,8 @@ export const bramStokerWinners = [
     title: "There's Something Sinister in Center Field",
     author: "Robert P. Ottone",
     ageRange: "Age 9–12",
-    summary: "A baseball season turns frighteningly wrong. Sports and supernatural horror collide. Fun, eerie, and very readable."
+    summary: "A baseball season turns frighteningly wrong. Sports and supernatural horror collide. Fun, eerie, and very readable.",
+    cover: "/covers/Bram Stoker/there-is-something-sinister-in-centerfield.jpg"
   },
   {
     year: 2024,
@@ -95,7 +99,8 @@ export const bramStokerWinners = [
     title: "The Witch in the Woods",
     author: "Michaelbrent Collings",
     ageRange: "Age 10–13",
-    summary: "A survival horror story set deep in the woods. Tension escalates quickly. Scarier than average, best for confident readers."
+    summary: "A survival horror story set deep in the woods. Tension escalates quickly. Scarier than average, best for confident readers.",
+    cover: "/covers/Bram Stoker/the-witch-in-the-woods.jpg"
   },
   {
     year: 2024,
