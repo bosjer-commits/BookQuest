@@ -82,6 +82,13 @@ function LibraryContent() {
       setCoverUrl(null);
       setDescription(null);
 
+      // Check if book has a cover defined in the data first
+      if (currentBook.cover) {
+        setCoverUrl(currentBook.cover);
+        setLoading(false);
+        return;
+      }
+
       const titleAuthorKey = makeTitleAuthorKey(currentBook.title, currentBook.author);
       const overrideTitleAuthor = getCoverOverrideByTitleAuthor(
         currentBook.title,
