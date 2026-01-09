@@ -13,6 +13,8 @@ export interface PrizeCategory {
     illustrator?: string;
     publisher?: string;
     cover?: string;
+    ageRange?: string;
+    summary?: string;
   }>;
 }
 

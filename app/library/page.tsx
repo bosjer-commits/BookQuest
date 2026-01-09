@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { Suspense, useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -14,7 +14,7 @@ import { getCoverOverrideByIsbn, getCoverOverrideByTitleAuthor } from '@/data/co
 import { useCurrentBook } from '@/contexts/CurrentBookContext';
 import { useFavorites } from '@/contexts/FavoritesContext';
 
-export default function LibraryPage() {
+function LibraryContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const didInitFromQuery = useRef(false);
@@ -305,5 +305,13 @@ export default function LibraryPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function LibraryPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="text-white">Loading...</div></div>}>
+      <LibraryContent />
+    </Suspense>
   );
 }
