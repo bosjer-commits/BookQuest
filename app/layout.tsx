@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { CurrentBookProvider } from "@/contexts/CurrentBookContext";
 import { FavoritesProvider } from "@/contexts/FavoritesContext";
+import { ChestProvider } from "@/contexts/ChestContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,7 +31,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="debug-grid">
+    <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
@@ -38,7 +39,9 @@ export default function RootLayout({
         <div className="app-container">
           <CurrentBookProvider>
             <FavoritesProvider>
-              {children}
+              <ChestProvider>
+                {children}
+              </ChestProvider>
             </FavoritesProvider>
           </CurrentBookProvider>
         </div>

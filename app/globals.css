@@ -465,3 +465,239 @@ body {
   border-width: 20px 0 20px 12px;
   border-color: transparent transparent transparent var(--navy-dark);
 }
+
+/* ── Chest Opening Animations ── */
+
+@keyframes chest-idle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes chest-shake {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  10% { transform: translateX(-6px) rotate(-3deg); }
+  20% { transform: translateX(6px) rotate(3deg); }
+  30% { transform: translateX(-6px) rotate(-2deg); }
+  40% { transform: translateX(6px) rotate(2deg); }
+  50% { transform: translateX(-4px) rotate(-1deg); }
+  60% { transform: translateX(4px) rotate(1deg); }
+  70% { transform: translateX(-3px) rotate(-1deg); }
+  80% { transform: translateX(3px) rotate(1deg); }
+  90% { transform: translateX(-2px) rotate(0deg); }
+}
+
+@keyframes chest-upgrade-flash {
+  0% { transform: scale(1); filter: brightness(1); }
+  30% { transform: scale(1.15); filter: brightness(2); }
+  60% { transform: scale(1.05); filter: brightness(1.5); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+
+@keyframes tier-upgrade-flash {
+  0% { transform: scale(1); opacity: 1; }
+  20% { transform: scale(1.3); opacity: 0; }
+  50% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes chest-burst {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.8); opacity: 0.6; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+@keyframes burst-rays-spin {
+  0% { transform: rotate(0deg) scale(0.5); opacity: 0.9; }
+  100% { transform: rotate(90deg) scale(2); opacity: 0; }
+}
+
+@keyframes skin-reveal {
+  0% { transform: scale(0.3); filter: brightness(3); opacity: 0; }
+  40% { transform: scale(1.1); filter: brightness(1.5); opacity: 1; }
+  70% { transform: scale(0.95); filter: brightness(1); }
+  100% { transform: scale(1); filter: brightness(1); opacity: 1; }
+}
+
+@keyframes prompt-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* Chest container */
+.chest-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chest-container.phase-idle {
+  animation: chest-idle 2s ease-in-out infinite;
+}
+
+.chest-container.phase-shaking {
+  animation: chest-shake 0.4s ease-in-out infinite;
+}
+
+.chest-container.phase-upgrading {
+  animation: chest-upgrade-flash 0.6s ease-out forwards;
+}
+
+.chest-container.phase-opening {
+  animation: chest-burst 0.8s ease-out forwards;
+}
+
+/* Tier banner */
+.chest-tier-banner {
+  display: inline-block;
+  padding: 4px 16px;
+  border-radius: 12px;
+  font-weight: 900;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border: 2px solid rgba(255,255,255,0.3);
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.chest-tier-banner.flash {
+  animation: tier-upgrade-flash 0.5s ease-out forwards;
+}
+
+/* Burst rays */
+.burst-rays {
+  position: absolute;
+  inset: -50%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(255,255,255,0.3) 10deg,
+    transparent 20deg,
+    transparent 30deg,
+    rgba(255,255,255,0.3) 40deg,
+    transparent 50deg,
+    transparent 60deg,
+    rgba(255,255,255,0.3) 70deg,
+    transparent 80deg,
+    transparent 90deg,
+    rgba(255,255,255,0.3) 100deg,
+    transparent 110deg,
+    transparent 120deg,
+    rgba(255,255,255,0.3) 130deg,
+    transparent 140deg,
+    transparent 150deg,
+    rgba(255,255,255,0.3) 160deg,
+    transparent 170deg,
+    transparent 180deg,
+    rgba(255,255,255,0.3) 190deg,
+    transparent 200deg,
+    transparent 210deg,
+    rgba(255,255,255,0.3) 220deg,
+    transparent 230deg,
+    transparent 240deg,
+    rgba(255,255,255,0.3) 250deg,
+    transparent 260deg,
+    transparent 270deg,
+    rgba(255,255,255,0.3) 280deg,
+    transparent 290deg,
+    transparent 300deg,
+    rgba(255,255,255,0.3) 310deg,
+    transparent 320deg,
+    transparent 330deg,
+    rgba(255,255,255,0.3) 340deg,
+    transparent 350deg,
+    transparent 360deg
+  );
+  border-radius: 50%;
+  animation: burst-rays-spin 0.9s ease-out forwards;
+  pointer-events: none;
+}
+
+/* Skin reveal */
+.skin-reveal {
+  animation: skin-reveal 0.6s ease-out forwards;
+}
+
+/* Skin rarity badge */
+.skin-rarity-badge {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-weight: 900;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  border: 2px solid rgba(255,255,255,0.4);
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+/* NEW! badge */
+.new-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 8px;
+  font-weight: 900;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: #00B894;
+  color: white;
+  border: 2px solid rgba(255,255,255,0.4);
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
+}
+
+/* Upgrade flash text */
+@keyframes upgrade-text-flash {
+  0% { transform: scale(0.5); opacity: 0; }
+  30% { transform: scale(1.3); opacity: 1; }
+  70% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0.8); opacity: 0; }
+}
+
+.upgrade-flash-text {
+  animation: upgrade-text-flash 0.8s ease-out forwards;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* White flash on tier upgrade */
+@keyframes upgrade-tier-flash {
+  0% { background: rgba(255, 255, 255, 0.9); }
+  100% { background: rgba(255, 255, 255, 0); }
+}
+
+.upgrade-tier-flash {
+  animation: upgrade-tier-flash 0.4s ease-out forwards;
+}
+
+/* Upgrade arrow pulse - only applied via .active class to avoid conflicts */
+@keyframes arrow-pulse {
+  0%, 100% { transform: scale(1.2) translateY(0); }
+  50% { transform: scale(1.2) translateY(-4px); }
+}
+
+.upgrade-arrow.active {
+  animation: arrow-pulse 0.8s ease-in-out infinite;
+}
+
+/* Screen shake on tap */
+@keyframes screen-shake {
+  0%, 100% { transform: translate(0, 0); }
+  15% { transform: translate(-4px, 2px); }
+  30% { transform: translate(3px, -3px); }
+  45% { transform: translate(-2px, 1px); }
+  60% { transform: translate(2px, -1px); }
+  75% { transform: translate(-1px, 1px); }
+}
+
+.screen-shake {
+  animation: screen-shake 0.3s ease-out;
+}
+
+/* Prompt text */
+.chest-prompt-text {
+  animation: prompt-pulse 1.5s ease-in-out infinite;
+  font-weight: 900;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+}

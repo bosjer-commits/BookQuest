@@ -5,19 +5,29 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import BottomNav from '@/components/BottomNav';
 import { useCurrentBook } from '@/contexts/CurrentBookContext';
+import { useChest } from '@/contexts/ChestContext';
+import ChestOpeningModal from '@/components/ChestOpeningModal';
 
 export default function Home() {
   const router = useRouter();
   const { currentBook, finishedBooks, updateReadingProgress, updateRating, finishCurrentBook } = useCurrentBook();
+  const { isChestCollected } = useChest();
   const [showProgressEdit, setShowProgressEdit] = useState(false);
+  const [openingChestGoal, setOpeningChestGoal] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState('');
   const [totalPages, setTotalPages] = useState('');
+  const [chestPage, setChestPage] = useState(0);
 
   const percent = currentBook?.progress ?? 0;
   const hasCurrentBook = Boolean(currentBook);
   const rating = currentBook?.rating ?? 0;
   const finishedCount = finishedBooks.length;
-  const chestGoals = useMemo(() => [1, 2, 3], []);
+  const allChestGoals = useMemo(() => [1, 2, 3, 4, 5, 6, 7, 8, 9], []);
+  const chestGoals = useMemo(
+    () => allChestGoals.slice(chestPage * 3, chestPage * 3 + 3),
+    [allChestGoals, chestPage]
+  );
+  const totalChestPages = 3;
 
   const openProgressEdit = () => {
     setCurrentPage(currentBook?.currentPage?.toString() || '');
@@ -128,40 +138,84 @@ export default function Home() {
             <div className="flex items-end justify-between w-full gap-0 mt-6">
               {chestGoals.map((goal) => {
                 const unlocked = finishedCount >= goal;
+                const collected = isChestCollected(goal);
                 return (
                   <div key={goal} className="flex flex-col items-center gap-2">
-                    <Image
-                      src="/assets/chest.png"
-                      alt=""
-                      width={152}
-                      height={128}
-                      className="w-[152px] h-auto"
-                    />
+                    <div className="relative">
+                      <Image
+                        src="/assets/chest.png"
+                        alt=""
+                        width={152}
+                        height={128}
+                        className="w-[152px] h-auto"
+                        style={{ opacity: collected ? 0.5 : 1 }}
+                      />
+                      {collected && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                            <circle cx="12" cy="12" r="11" fill="#00B894" stroke="white" strokeWidth="2" />
+                            <path d="M7 12.5l3 3 7-7" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        </div>
+                      )}
+                    </div>
                     <div className="text-[10px] text-white brawl-text text-center -mt-2">
                       Read {goal} book{goal > 1 ? 's' : ''}
                     </div>
-                    <button
-                      className="px-3 py-1 text-[10px] font-bold text-navy rounded-full border-2 border-white shadow-[0_2px_0_rgba(0,0,0,0.35)]"
-                      disabled={!unlocked}
-                      style={{
-                        background: 'linear-gradient(to bottom, #FDCB6E 0%, #FFA502 100%)',
-                        opacity: unlocked ? 1 : 0.5
-                      }}
-                    >
-                      Collect
-                    </button>
+                    {collected ? (
+                      <span
+                        className="px-3 py-1 text-[10px] font-bold rounded-full border-2 border-white"
+                        style={{
+                          background: 'linear-gradient(to bottom, #00B894 0%, #00997A 100%)',
+                          color: 'white',
+                        }}
+                      >
+                        Collected
+                      </span>
+                    ) : (
+                      <button
+                        className="relative w-[90px] h-[28px]"
+                        disabled={!unlocked}
+                        onClick={() => unlocked && setOpeningChestGoal(goal)}
+                        style={{ opacity: unlocked ? 1 : 0.5 }}
+                      >
+                        <Image
+                          src="/assets/start.png"
+                          alt=""
+                          fill
+                          className="object-contain"
+                          sizes="90px"
+                        />
+                        <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold" style={{ color: '#5A3C12' }}>
+                          Collect
+                        </span>
+                      </button>
+                    )}
                   </div>
                 );
               })}
             </div>
           </div>
 
-          <button
-            className="absolute right-[-8px] top-1/2 -translate-y-1/2 w-10 h-10"
-            aria-label="Next chests"
-          >
-            <Image src="/assets/blueright.png" alt="" width={40} height={40} />
-          </button>
+          {chestPage > 0 && (
+            <button
+              className="absolute left-[-8px] top-1/2 -translate-y-1/2 w-10 h-10"
+              aria-label="Previous chests"
+              onClick={() => setChestPage((p) => p - 1)}
+            >
+              <Image src="/assets/blueleft.png" alt="" width={40} height={40} />
+            </button>
+          )}
+
+          {chestPage < totalChestPages - 1 && (
+            <button
+              className="absolute right-[-8px] top-1/2 -translate-y-1/2 w-10 h-10"
+              aria-label="Next chests"
+              onClick={() => setChestPage((p) => p + 1)}
+            >
+              <Image src="/assets/blueright.png" alt="" width={40} height={40} />
+            </button>
+          )}
         </div>
       </main>
 
@@ -338,6 +392,13 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {/* Chest Opening Modal */}
+      <ChestOpeningModal
+        isOpen={openingChestGoal !== null}
+        onClose={() => setOpeningChestGoal(null)}
+        chestGoal={openingChestGoal ?? 0}
+      />
 
     </div>
   );

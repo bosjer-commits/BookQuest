@@ -1,6 +1,8 @@
 import { deGoudenGriffelWinners } from './deGoudenGriffel';
 import { augustprisetWinners } from './augustpriset';
 import { bramStokerWinners } from './bramStoker';
+import { groteVriendelijke100 } from './groteVriendelijke';
+import { lasarnasLegender } from './LasarnasLegender';
 
 export interface PrizeCategory {
   id: string;
@@ -36,5 +38,17 @@ export const prizeCategories: PrizeCategory[] = [
     name: 'Bram Stoker Award',
     domeImage: '/assets/stokerdome.png',
     books: [...bramStokerWinners].reverse(),
+  },
+  {
+    id: 'grote-vriendelijke',
+    name: 'Grote Vriendelijke 100',
+    domeImage: '/assets/grotevriendelijkedome.png',
+    books: groteVriendelijke100,
+  },
+  {
+    id: 'lasarnas-legender',
+    name: 'Läsarnas Legender',
+    domeImage: '/assets/lasarnasdome.png',
+    books: lasarnasLegender,
   },
 ];

@@ -257,8 +257,9 @@ function LibraryContent() {
             <div className="absolute inset-0 px-6 py-10 flex flex-col items-center text-center">
               <div className="w-full flex-1 flex flex-col items-center">
                 <h3
-                  className="text-[26px] font-bold brawl-text"
+                  className="font-bold brawl-text w-full truncate"
                   style={{
+                    fontSize: currentBook.title.length > 20 ? 'clamp(16px, 4vw, 22px)' : '26px',
                     color: '#F6D58A',
                     textShadow:
                       '-2px 0 #5A3C12, 2px 0 #5A3C12, 0 -2px #5A3C12, 0 2px #5A3C12',
@@ -267,8 +268,8 @@ function LibraryContent() {
                   {currentBook.title}
                 </h3>
 
-                <div className="mt-3 space-y-1 text-[16px] font-bold text-[#F6D58A] brawl-text">
-                  <div>Author: {currentBook.author}</div>
+                <div className="mt-3 space-y-1 text-[16px] font-bold text-[#F6D58A] brawl-text w-full">
+                  <div className="truncate">Author: {currentBook.author}</div>
                   <div>Year: {currentBook.year}</div>
                   {currentBook.ageRange && <div>Age Range: {currentBook.ageRange}</div>}
                 </div>

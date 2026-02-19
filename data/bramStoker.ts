@@ -4,21 +4,21 @@ export const bramStokerWinners = [
     title: "They Stole Our Hearts",
     author: "Daniel Kraus",
     ageRange: "Age 11–14",
-    summary: "A dark and emotional story with eerie undertones. Blends horror elements with themes of friendship and loss. Atmospheric and unsettling, recommended for confident older middle-grade readers."
+    summary: "A dark and emotional story with eerie undertones. Blends horror elements with themes of friendship and loss. Atmospheric and unsettling."
   },
   {
     year: 2022,
     title: "This Appearing House",
     author: "Ally Malinenko",
     ageRange: "Age 10–13",
-    summary: "A haunted house story that slowly builds tension. Focuses on grief, memory, and things that refuse to stay buried. Creepy but thoughtful, suitable for readers who enjoy emotional ghost stories."
+    summary: "A haunted house story that focuses on grief, memory, and things that refuse to stay buried. Creepy but thoughtful"
   },
   {
     year: 2022,
     title: "Camp Scare",
     author: "Delilah S. Dawson",
     ageRange: "Age 9–12",
-    summary: "A summer camp turns terrifying when legends come alive. Classic campfire horror mixed with humor and adventure. Fast-paced, spooky, and very accessible."
+    summary: "A summer camp turns terrifying. Classic campfire horror mixed with humor and adventure. Fast-paced, spooky, and very accessible."
   },
   {
     year: 2022,
@@ -33,7 +33,7 @@ export const bramStokerWinners = [
     title: "A Comb of Wishes",
     author: "Lisa Stringfellow",
     ageRange: "Age 9–12",
-    summary: "A magical story rooted in Caribbean folklore. A girl makes dangerous wishes to fix her family's problems. Gentle fantasy with light spooky elements."
+    summary: "A magical story rooted in Caribbean folklore. A girl makes wishes to fix her family's problems. Gentle with light spooky elements."
   },
   {
     year: 2023,
