@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createClient } from '@/lib/supabase/client';
 
 interface Book {
   year: number;
@@ -27,38 +28,79 @@ interface FavoritesContextType {
 
 const FavoritesContext = createContext<FavoritesContextType | undefined>(undefined);
 
-export function FavoritesProvider({ children }: { children: ReactNode }) {
+export function FavoritesProvider({ children, userId }: { children: ReactNode; userId: string }) {
   const [favorites, setFavorites] = useState<FavoriteBook[]>([]);
+  const supabase = createClient();
 
-  // Load from localStorage on mount
+  // Load from Supabase on mount / userId change
   useEffect(() => {
-    const saved = localStorage.getItem('favorites');
-    if (saved) {
-      try {
-        setFavorites(JSON.parse(saved));
-      } catch (e) {
-        console.error('Failed to parse saved favorites:', e);
+    async function load() {
+      const { data, error } = await supabase
+        .from('user_books')
+        .select('title, author, cover_url, book_year, favorited_at')
+        .eq('user_id', userId)
+        .eq('is_favorite', true)
+        .order('favorited_at', { ascending: false });
+
+      if (error) {
+        console.error('Failed to load favorites:', error);
+        return;
       }
-    }
-  }, []);
 
-  // Save to localStorage whenever favorites change
-  useEffect(() => {
-    localStorage.setItem('favorites', JSON.stringify(favorites));
-  }, [favorites]);
+      setFavorites(
+        (data ?? []).map((row) => ({
+          book: { year: row.book_year ?? 0, title: row.title, author: row.author },
+          coverUrl: row.cover_url ?? undefined,
+          addedAt: row.favorited_at ?? Date.now(),
+        }))
+      );
+    }
+    load();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
 
   const addFavorite = (book: Book, coverUrl?: string) => {
+    const addedAt = Date.now();
+
+    // Optimistic update
     setFavorites((prev) => {
-      // Don't add if already exists
-      if (prev.some((fav) => fav.book.title === book.title)) {
-        return prev;
-      }
-      return [...prev, { book, coverUrl, addedAt: Date.now() }];
+      if (prev.some((fav) => fav.book.title === book.title)) return prev;
+      return [...prev, { book, coverUrl, addedAt }];
     });
+
+    // Sync to Supabase (upsert so we don't overwrite reading progress columns)
+    supabase
+      .from('user_books')
+      .upsert(
+        {
+          user_id: userId,
+          title: book.title,
+          author: book.author,
+          cover_url: coverUrl ?? null,
+          book_year: book.year,
+          is_favorite: true,
+          favorited_at: addedAt,
+        },
+        { onConflict: 'user_id,title' }
+      )
+      .then(({ error }) => {
+        if (error) console.error('Failed to save favorite:', error);
+      });
   };
 
   const removeFavorite = (bookTitle: string) => {
+    // Optimistic update
     setFavorites((prev) => prev.filter((fav) => fav.book.title !== bookTitle));
+
+    // Sync to Supabase
+    supabase
+      .from('user_books')
+      .update({ is_favorite: false, favorited_at: null })
+      .eq('user_id', userId)
+      .eq('title', bookTitle)
+      .then(({ error }) => {
+        if (error) console.error('Failed to remove favorite:', error);
+      });
   };
 
   const isFavorite = (bookTitle: string) => {

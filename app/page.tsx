@@ -6,17 +6,21 @@ import { useRouter } from 'next/navigation';
 import BottomNav from '@/components/BottomNav';
 import { useCurrentBook } from '@/contexts/CurrentBookContext';
 import { useChest } from '@/contexts/ChestContext';
+import { useUser } from '@/contexts/UserContext';
+import { SKIN_CATALOG } from '@/data/skins';
 import ChestOpeningModal from '@/components/ChestOpeningModal';
 
 export default function Home() {
   const router = useRouter();
   const { currentBook, finishedBooks, updateReadingProgress, updateRating, finishCurrentBook } = useCurrentBook();
   const { isChestCollected } = useChest();
+  const { canEditProgress, viewingProfile, isParentMode, activeProfile, logout, clearKidSelection } = useUser();
   const [showProgressEdit, setShowProgressEdit] = useState(false);
   const [openingChestGoal, setOpeningChestGoal] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState('');
   const [totalPages, setTotalPages] = useState('');
   const [chestPage, setChestPage] = useState(0);
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   const percent = currentBook?.progress ?? 0;
   const hasCurrentBook = Boolean(currentBook);
@@ -35,12 +39,103 @@ export default function Home() {
     setShowProgressEdit(true);
   };
 
+  // Avatar image for floating user button
+  const avatarSkin = viewingProfile
+    ? SKIN_CATALOG.find((s) => s.owner.toLowerCase() === viewingProfile.name.toLowerCase())?.asset
+    : null;
+
   return (
     <div className="min-h-full flex flex-col">
+      {/* Floating user avatar button */}
+      <button
+        type="button"
+        onClick={() => setShowUserMenu((v) => !v)}
+        className="fixed top-3 left-3 z-40 rounded-full overflow-hidden flex items-center justify-center"
+        style={{
+          width: '40px',
+          height: '40px',
+          background: 'rgba(22,37,68,0.85)',
+          border: '2px solid rgba(116,185,255,0.6)',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.4)',
+        }}
+        aria-label="User menu"
+      >
+        {avatarSkin ? (
+          <Image src={avatarSkin} alt={viewingProfile?.name ?? ''} width={40} height={40} className="w-full h-full object-cover" />
+        ) : (
+          <span className="text-xs font-black" style={{ color: '#7EC3FF' }}>
+            {viewingProfile?.name?.slice(0, 1) ?? '?'}
+          </span>
+        )}
+      </button>
+
+      {/* User menu dropdown */}
+      {showUserMenu && (
+        <div
+          className="fixed top-14 left-3 z-40 rounded-xl py-2 px-3 flex flex-col gap-2 min-w-[160px]"
+          style={{
+            background: 'rgba(22,37,68,0.97)',
+            border: '2px solid rgba(116,185,255,0.4)',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
+          }}
+        >
+          <div className="text-sm font-bold brawl-text" style={{ color: '#F6D58A' }}>
+            {viewingProfile?.name}
+          </div>
+          {isParentMode && (
+            <div className="text-xs" style={{ color: '#C8B4FF' }}>
+              Managing: {viewingProfile?.name}
+            </div>
+          )}
+          {isParentMode && (
+            <button
+              type="button"
+              onClick={() => { clearKidSelection(); setShowUserMenu(false); }}
+              className="text-left text-xs font-bold py-1"
+              style={{ color: '#74B9FF' }}
+            >
+              Change Kid
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => { logout(); setShowUserMenu(false); }}
+            className="text-left text-xs font-bold py-1"
+            style={{ color: '#FF6B6B' }}
+          >
+            Switch User
+          </button>
+        </div>
+      )}
+
+      {/* Backdrop to close menu */}
+      {showUserMenu && (
+        <div
+          className="fixed inset-0 z-30"
+          onClick={() => setShowUserMenu(false)}
+        />
+      )}
+
       <main
         className="flex-1 flex flex-col items-center justify-start px-4 pt-4 pb-0 space-y-6"
         style={{ paddingBottom: '72px' }}
       >
+        {/* Parent mode indicator */}
+        {isParentMode && (
+          <div
+            className="w-full max-w-[320px] text-center text-xs font-bold brawl-text rounded-full py-1 px-3"
+            style={{
+              color: '#C8B4FF',
+              background: 'rgba(162,155,254,0.15)',
+              border: '1px solid rgba(162,155,254,0.3)',
+              marginTop: '8px',
+              marginBottom: '-16px',
+            }}
+          >
+            Managing: {viewingProfile?.name}
+          </div>
+        )}
+
         {/* Book Frame */}
         <div className="w-full flex justify-center" style={{ marginTop: '-5px' }}>
           <div className="relative">
@@ -61,13 +156,19 @@ export default function Home() {
                 )}
               </div>
             ) : (
-              <button
-                onClick={() => router.push('/library')}
-                className="absolute inset-[10%] z-[1] flex items-center justify-center rounded bg-white/10 border-2 border-white/40"
-                aria-label="Add a book"
-              >
-                <span className="text-white text-6xl font-bold leading-none">+</span>
-              </button>
+              canEditProgress ? (
+                <button
+                  onClick={() => router.push('/library')}
+                  className="absolute inset-[10%] z-[1] flex items-center justify-center rounded bg-white/10 border-2 border-white/40"
+                  aria-label="Add a book"
+                >
+                  <span className="text-white text-6xl font-bold leading-none">+</span>
+                </button>
+              ) : (
+                <div className="absolute inset-[10%] z-[1] flex items-center justify-center rounded bg-white/10 border-2 border-white/40">
+                  <span className="text-white text-4xl font-bold leading-none opacity-30">📖</span>
+                </div>
+              )
             )}
 
             <img
@@ -102,24 +203,26 @@ export default function Home() {
                 : `${percent}%`}
             </div>
           </div>
-          <button
-            onClick={openProgressEdit}
-            className="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full border-2 border-gold flex items-center justify-center bg-navy"
-            aria-label="Edit progress"
-            disabled={!hasCurrentBook}
-            style={{
-              opacity: hasCurrentBook ? 1 : 0.5,
-              marginRight: '-18px',
-              marginTop: '-8px'
-            }}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path
-                d="M3 17.25V21h3.75l11.06-11.06-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"
-                fill="#FFD93D"
-              />
-            </svg>
-          </button>
+          {canEditProgress && (
+            <button
+              onClick={openProgressEdit}
+              className="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full border-2 border-gold flex items-center justify-center bg-navy"
+              aria-label="Edit progress"
+              disabled={!hasCurrentBook}
+              style={{
+                opacity: hasCurrentBook ? 1 : 0.5,
+                marginRight: '-18px',
+                marginTop: '-8px'
+              }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path
+                  d="M3 17.25V21h3.75l11.06-11.06-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"
+                  fill="#FFD93D"
+                />
+              </svg>
+            </button>
+          )}
         </div>
 
         {/* Chest Frame */}
@@ -221,8 +324,8 @@ export default function Home() {
 
       <BottomNav active="home" />
 
-      {/* Progress Edit Modal */}
-      {showProgressEdit && (
+      {/* Progress Edit Modal — only accessible in parent mode */}
+      {showProgressEdit && canEditProgress && (
         <div
           className="fixed inset-0 bg-[var(--navy)] flex items-center justify-center z-50 p-4"
           onClick={() => setShowProgressEdit(false)}

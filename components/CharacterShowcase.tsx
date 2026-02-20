@@ -6,11 +6,27 @@ import Image from 'next/image';
 type CharacterShowcaseProps = {
   skins: string[];
   name: string;
+  activeIndex?: number;
+  onIndexChange?: (index: number) => void;
 };
 
-export default function CharacterShowcase({ skins, name }: CharacterShowcaseProps) {
-  const [activeSkinIndex, setActiveSkinIndex] = useState(0);
-  const currentSkin = skins[activeSkinIndex];
+export default function CharacterShowcase({ skins, name, activeIndex, onIndexChange }: CharacterShowcaseProps) {
+  const [internalIndex, setInternalIndex] = useState(0);
+  const isControlled = onIndexChange !== undefined;
+  const activeSkinIndex = isControlled ? (activeIndex ?? 0) : internalIndex;
+  const currentSkin = skins[Math.min(activeSkinIndex, skins.length - 1)] ?? skins[0];
+
+  const handlePrev = () => {
+    const next = (activeSkinIndex - 1 + skins.length) % skins.length;
+    if (isControlled) onIndexChange!(next);
+    else setInternalIndex(next);
+  };
+
+  const handleNext = () => {
+    const next = (activeSkinIndex + 1) % skins.length;
+    if (isControlled) onIndexChange!(next);
+    else setInternalIndex(next);
+  };
 
   return (
     <div className="relative h-[50vh] w-full">
@@ -123,7 +139,7 @@ export default function CharacterShowcase({ skins, name }: CharacterShowcaseProp
 
       <button
         type="button"
-        onClick={() => setActiveSkinIndex((prev) => (prev - 1 + skins.length) % skins.length)}
+        onClick={handlePrev}
         className="absolute -left-5 top-1/2 -translate-y-1/2 w-14 h-14 flex items-center justify-center z-30"
         aria-label="Previous skin"
       >
@@ -171,7 +187,7 @@ export default function CharacterShowcase({ skins, name }: CharacterShowcaseProp
 
       <button
         type="button"
-        onClick={() => setActiveSkinIndex((prev) => (prev + 1) % skins.length)}
+        onClick={handleNext}
         className="absolute -right-5 top-1/2 -translate-y-1/2 w-14 h-14 flex items-center justify-center z-30"
         aria-label="Next skin"
       >

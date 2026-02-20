@@ -41,20 +41,22 @@ export default function FriendRow({ friend, books, onSelectBook }: FriendRowProp
           }}
         />
 
-        {/* Character with glow aura */}
+        {/* Character with glow aura — fixed 128×128 box prevents layout shift between skins */}
         <div
           style={{
             filter: 'drop-shadow(0 0 20px rgba(255,211,61,0.5)) drop-shadow(0 0 40px rgba(255,165,2,0.3))',
             position: 'relative',
             zIndex: 1,
+            width: '128px',
+            height: '128px',
+            flexShrink: 0,
           }}
         >
           <Image
             src={friend.skin}
             alt={friend.name}
-            width={256}
-            height={256}
-            style={{ width: '128px', height: 'auto' }}
+            fill
+            style={{ objectFit: 'contain', objectPosition: 'bottom' }}
           />
         </div>
         <div className="text-[16px] text-[#7EC3FF] brawl-text mt-2" style={{ position: 'relative', zIndex: 1 }}>

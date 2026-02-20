@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useChest } from '@/contexts/ChestContext';
+import { useUser } from '@/contexts/UserContext';
 import {
   type SkinDefinition,
   type ChestTier,
@@ -32,6 +33,7 @@ interface ChestOpeningModalProps {
 
 export default function ChestOpeningModal({ isOpen, onClose, chestGoal }: ChestOpeningModalProps) {
   const { unlockedSkins, unlockSkin, markChestCollected, isSkinUnlocked } = useChest();
+  const { viewingProfile } = useUser();
   const [phase, setPhase] = useState<Phase>('shimmer');
   const [tier, setTier] = useState<ChestTier>('brawl');
   const [rewardSkin, setRewardSkin] = useState<SkinDefinition | null>(null);
@@ -119,14 +121,14 @@ export default function ChestOpeningModal({ isOpen, onClose, chestGoal }: ChestO
       setPhase('upgrade3');
     } else if (phase === 'ready') {
       // Roll skin reward and open
-      const skin = rollSkin(tier, unlockedSkins);
+      const skin = rollSkin(tier, unlockedSkins, viewingProfile?.name);
       setRewardSkin(skin);
       setWasAlreadyUnlocked(isSkinUnlocked(skin.id));
       unlockSkin(skin.id);
       markChestCollected(chestGoal);
       setPhase('opening');
     }
-  }, [phase, tier, unlockedSkins, unlockSkin, markChestCollected, isSkinUnlocked, chestGoal, doUpgrade, triggerShake]);
+  }, [phase, tier, unlockedSkins, viewingProfile, unlockSkin, markChestCollected, isSkinUnlocked, chestGoal, doUpgrade, triggerShake]);
 
   if (!isOpen) return null;
 
@@ -310,7 +312,7 @@ export default function ChestOpeningModal({ isOpen, onClose, chestGoal }: ChestO
               className="skin-rarity-badge"
               style={{
                 background: RARITY_COLORS[rewardSkin.rarity],
-                color: rewardSkin.rarity === 'epic' ? '#1A1F3A' : '#fff',
+                color: '#fff',
               }}
             >
               {RARITY_LABELS[rewardSkin.rarity]}

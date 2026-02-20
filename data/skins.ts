@@ -1,4 +1,4 @@
-export type Rarity = 'common' | 'rare' | 'epic';
+export type Rarity = 'rare' | 'epic' | 'legendary';
 
 export interface SkinDefinition {
   id: string;
@@ -9,29 +9,60 @@ export interface SkinDefinition {
 }
 
 export const SKIN_CATALOG: SkinDefinition[] = [
-  // Common (9)
-  { id: 'robin-shelly',  character: 'Shelly', owner: 'Robin',   asset: '/assets/Skins/Robin/Shelly.png',  rarity: 'common' },
-  { id: 'robin-bull',    character: 'Bull',   owner: 'Robin',   asset: '/assets/Skins/Robin/Bull.png',    rarity: 'common' },
-  { id: 'robin-poco',    character: 'Poco',   owner: 'Robin',   asset: '/assets/Skins/Robin/Poco.png',    rarity: 'common' },
-  { id: 'robin-spike',   character: 'Spike',  owner: 'Robin',   asset: '/assets/Skins/Robin/Spike.png',   rarity: 'common' },
-  { id: 'simon-shelly',  character: 'Shelly', owner: 'Simon',   asset: '/assets/Skins/Simon/Shelly.png',  rarity: 'common' },
-  { id: 'simon-bull',    character: 'Bull',   owner: 'Simon',   asset: '/assets/Skins/Simon/Bull.png',    rarity: 'common' },
-  { id: 'simon-spike',   character: 'Spike',  owner: 'Simon',   asset: '/assets/Skins/Simon/Spike.png',   rarity: 'common' },
-  { id: 'oliver-shelly', character: 'Shelly', owner: 'Oliver',  asset: '/assets/Skins/Oliver/Shelly.png', rarity: 'common' },
-  { id: 'lucas-spike',   character: 'Spike',  owner: 'Lucas',   asset: '/assets/Skins/Lucas/Spike.png',   rarity: 'common' },
+  // Lucas — Rare
+  { id: 'lucas-edgar',    character: 'Edgar',    owner: 'Lucas',   asset: '/assets/Skins/Lucas/Rare/Edgar.png',          rarity: 'rare' },
+  { id: 'lucas-emz',      character: 'Emz',      owner: 'Lucas',   asset: '/assets/Skins/Lucas/Rare/Emz.png',            rarity: 'rare' },
+  { id: 'lucas-kenji',    character: 'Kenji',    owner: 'Lucas',   asset: '/assets/Skins/Lucas/Rare/Kenji.png',          rarity: 'rare' },
+  // Lucas — Epic
+  { id: 'lucas-broock',   character: 'Broock',   owner: 'Lucas',   asset: '/assets/Skins/Lucas/Epic/Broock.png',         rarity: 'epic' },
+  { id: 'lucas-mortis',   character: 'Mortis',   owner: 'Lucas',   asset: '/assets/Skins/Lucas/Epic/Mortis.png',         rarity: 'epic' },
+  { id: 'lucas-sam',      character: 'Sam',      owner: 'Lucas',   asset: '/assets/Skins/Lucas/Epic/Sam.png',            rarity: 'epic' },
+  // Lucas — Legendary
+  { id: 'lucas-glowbert', character: 'Glowbert', owner: 'Lucas',   asset: '/assets/Skins/Lucas/Legendary/Glowbert.png', rarity: 'legendary' },
+  { id: 'lucas-spike',    character: 'Spike',    owner: 'Lucas',   asset: '/assets/Skins/Lucas/Legendary/Spike.png',    rarity: 'legendary' },
+  { id: 'lucas-surge',    character: 'Surge',    owner: 'Lucas',   asset: '/assets/Skins/Lucas/Legendary/Surge.png',    rarity: 'legendary' },
 
-  // Rare (5)
-  { id: 'robin-edgar',   character: 'Edgar',  owner: 'Robin',   asset: '/assets/Skins/Robin/Edgar.png',   rarity: 'rare' },
-  { id: 'robin-mandy',   character: 'Mandy',  owner: 'Robin',   asset: '/assets/Skins/Robin/Mandy.png',   rarity: 'rare' },
-  { id: 'robin-bibi',    character: 'Bibi',   owner: 'Robin',   asset: '/assets/Skins/Robin/Bibi.png',    rarity: 'rare' },
-  { id: 'oliver-edgar',  character: 'Edgar',  owner: 'Oliver',  asset: '/assets/Skins/Oliver/Edgar.png',  rarity: 'rare' },
-  { id: 'lucas-broock',  character: 'Broock', owner: 'Lucas',   asset: '/assets/Skins/Lucas/Broock.png',  rarity: 'rare' },
+  // Oliver — Rare
+  { id: 'oliver-angelo',  character: 'Angelo',   owner: 'Oliver',  asset: '/assets/Skins/Oliver/Rare/Angelo.png',        rarity: 'rare' },
+  { id: 'oliver-crow',    character: 'Crow',     owner: 'Oliver',  asset: '/assets/Skins/Oliver/Rare/Crow.png',          rarity: 'rare' },
+  { id: 'oliver-shelly',  character: 'Shelly',   owner: 'Oliver',  asset: '/assets/Skins/Oliver/Rare/Shelly.png',        rarity: 'rare' },
+  // Oliver — Epic
+  { id: 'oliver-barley',  character: 'Barley',   owner: 'Oliver',  asset: '/assets/Skins/Oliver/Epic/Barley.png',        rarity: 'epic' },
+  { id: 'oliver-edgar',   character: 'Edgar',    owner: 'Oliver',  asset: '/assets/Skins/Oliver/Epic/Edgar.png',         rarity: 'epic' },
+  { id: 'oliver-leon',    character: 'Leon',     owner: 'Oliver',  asset: '/assets/Skins/Oliver/Epic/Leon.png',          rarity: 'epic' },
+  // Oliver — Legendary
+  { id: 'oliver-dynamike', character: 'Dynamike', owner: 'Oliver', asset: '/assets/Skins/Oliver/Legendary/Dynamike.png', rarity: 'legendary' },
+  { id: 'oliver-elprimo', character: 'ElPrimo',  owner: 'Oliver',  asset: '/assets/Skins/Oliver/Legendary/ElPrimo.png', rarity: 'legendary' },
+  { id: 'oliver-spike',   character: 'Spike',    owner: 'Oliver',  asset: '/assets/Skins/Oliver/Legendary/Spike.png',   rarity: 'legendary' },
 
-  // Epic (4)
-  { id: 'oliver-angelo', character: 'Angelo', owner: 'Oliver',  asset: '/assets/Skins/Oliver/Angelo.png', rarity: 'epic' },
-  { id: 'oliver-crow',   character: 'Crow',   owner: 'Oliver',  asset: '/assets/Skins/Oliver/Crow.png',   rarity: 'epic' },
-  { id: 'elliott-spike', character: 'Spike',  owner: 'Elliott', asset: '/assets/Skins/Elliott/Spike.png', rarity: 'epic' },
-  { id: 'simon-edgar',   character: 'Edgar',  owner: 'Simon',   asset: '/assets/Skins/Simon/EdgarS.png',  rarity: 'epic' },
+  // Robin — Rare
+  { id: 'robin-bibi',     character: 'Bibi',     owner: 'Robin',   asset: '/assets/Skins/Robin/Rare/Bibi.png',           rarity: 'rare' },
+  { id: 'robin-bull',     character: 'Bull',     owner: 'Robin',   asset: '/assets/Skins/Robin/Rare/Bull.png',           rarity: 'rare' },
+  { id: 'robin-mandy',    character: 'Mandy',    owner: 'Robin',   asset: '/assets/Skins/Robin/Rare/Mandy.png',          rarity: 'rare' },
+  // Robin — Epic
+  { id: 'robin-dynamike', character: 'Dynamike', owner: 'Robin',   asset: '/assets/Skins/Robin/Epic/Dynamike.png',       rarity: 'epic' },
+  { id: 'robin-edgar',    character: 'Edgar',    owner: 'Robin',   asset: '/assets/Skins/Robin/Epic/Edgar.png',          rarity: 'epic' },
+  { id: 'robin-leon',     character: 'Leon',     owner: 'Robin',   asset: '/assets/Skins/Robin/Epic/Leon.png',           rarity: 'epic' },
+  // Robin — Legendary
+  { id: 'robin-mortis',   character: 'Mortis',   owner: 'Robin',   asset: '/assets/Skins/Robin/Legendary/Mortis.png',   rarity: 'legendary' },
+  { id: 'robin-poco',     character: 'Poco',     owner: 'Robin',   asset: '/assets/Skins/Robin/Legendary/Poco.png',     rarity: 'legendary' },
+  { id: 'robin-spike',    character: 'Spike',    owner: 'Robin',   asset: '/assets/Skins/Robin/Legendary/Spike.png',    rarity: 'legendary' },
+
+  // Simon — Rare
+  { id: 'simon-colt',     character: 'Colt',     owner: 'Simon',   asset: '/assets/Skins/Simon/Rare/Colt.png',           rarity: 'rare' },
+  { id: 'simon-fang',     character: 'Fang',     owner: 'Simon',   asset: '/assets/Skins/Simon/Rare/Fang.png',           rarity: 'rare' },
+  { id: 'simon-shelly',   character: 'Shelly',   owner: 'Simon',   asset: '/assets/Skins/Simon/Rare/Shelly.png',         rarity: 'rare' },
+  // Simon — Epic
+  { id: 'simon-barley',   character: 'Barley',   owner: 'Simon',   asset: '/assets/Skins/Simon/Epic/Barley.png',         rarity: 'epic' },
+  { id: 'simon-edgar',    character: 'Edgar',    owner: 'Simon',   asset: '/assets/Skins/Simon/Epic/Edgar.png',          rarity: 'epic' },
+  { id: 'simon-leon',     character: 'Leon',     owner: 'Simon',   asset: '/assets/Skins/Simon/Epic/Leon.png',           rarity: 'epic' },
+  // Simon — Legendary
+  { id: 'simon-bull',     character: 'Bull',     owner: 'Simon',   asset: '/assets/Skins/Simon/Legendary/Bull.png',     rarity: 'legendary' },
+  { id: 'simon-elprimo',  character: 'ElPrimo',  owner: 'Simon',   asset: '/assets/Skins/Simon/Legendary/ElPrimo.png',  rarity: 'legendary' },
+  { id: 'simon-spike',    character: 'Spike',    owner: 'Simon',   asset: '/assets/Skins/Simon/Legendary/Spike.png',    rarity: 'legendary' },
+
+  // Elliott
+  { id: 'elliott-spike',  character: 'Spike',    owner: 'Elliott', asset: '/assets/Skins/Elliott/Spike.png',            rarity: 'epic' },
 ];
 
 export type ChestTier = 'brawl' | 'big' | 'mega';
@@ -42,33 +73,33 @@ export interface ChestTierDef {
   chestImage: string;
   openingAnimation: string;
   swirlAnimation: string;
-  rarityOdds: Record<Rarity, number>;
+  rarity: Rarity;
 }
 
 export const CHEST_TIERS: Record<ChestTier, ChestTierDef> = {
   brawl: {
     label: 'Brawl Box',
     glow: '#74B9FF',
-    chestImage: '/assets/chest.png',
+    chestImage: '/assets/chests/blue_chest_swirls.png',
     openingAnimation: '/assets/chests/blue_chest_opens.webp',
     swirlAnimation: '/assets/chests/blue_chest_swirls.webp',
-    rarityOdds: { common: 0.70, rare: 0.25, epic: 0.05 },
+    rarity: 'rare',
   },
   big: {
     label: 'Big Box',
     glow: '#FF6B6B',
-    chestImage: '/assets/REDchest.png',
+    chestImage: '/assets/chests/red_chest_swirls.png',
     openingAnimation: '/assets/chests/red_chest_opens.webp',
     swirlAnimation: '/assets/chests/red_chest_swirls.webp',
-    rarityOdds: { common: 0.50, rare: 0.35, epic: 0.15 },
+    rarity: 'epic',
   },
   mega: {
     label: 'Mega Box',
     glow: '#A29BFE',
-    chestImage: '/assets/REDDERchest.png',
+    chestImage: '/assets/chests/purple_chest_swirls.png',
     openingAnimation: '/assets/chests/purple_chest_opens.webp',
     swirlAnimation: '/assets/chests/purple_chest_swirls.webp',
-    rarityOdds: { common: 0.25, rare: 0.40, epic: 0.35 },
+    rarity: 'legendary',
   },
 };
 
@@ -78,15 +109,15 @@ const UPGRADE_CHANCES: Partial<Record<ChestTier, { next: ChestTier; chance: numb
 };
 
 export const RARITY_COLORS: Record<Rarity, string> = {
-  common: '#74B9FF',
-  rare: '#A29BFE',
-  epic: '#FFD93D',
+  rare: '#74B9FF',
+  epic: '#FF6B6B',
+  legendary: '#A29BFE',
 };
 
 export const RARITY_LABELS: Record<Rarity, string> = {
-  common: 'RARE',
-  rare: 'EPIC',
-  epic: 'LEGENDARY',
+  rare: 'RARE',
+  epic: 'EPIC',
+  legendary: 'LEGENDARY',
 };
 
 export function tryUpgrade(currentTier: ChestTier): ChestTier {
@@ -95,27 +126,19 @@ export function tryUpgrade(currentTier: ChestTier): ChestTier {
   return Math.random() < upgrade.chance ? upgrade.next : currentTier;
 }
 
-export function rollSkin(tier: ChestTier, unlockedSkinIds: string[]): SkinDefinition {
-  const odds = CHEST_TIERS[tier].rarityOdds;
-  const available = SKIN_CATALOG.filter((s) => !unlockedSkinIds.includes(s.id));
+export function rollSkin(tier: ChestTier, unlockedSkinIds: string[], ownerFilter?: string): SkinDefinition {
+  const targetRarity = CHEST_TIERS[tier].rarity;
+  const catalog = ownerFilter
+    ? SKIN_CATALOG.filter((s) => s.owner.toLowerCase() === ownerFilter.toLowerCase())
+    : SKIN_CATALOG;
+  const available = catalog.filter((s) => !unlockedSkinIds.includes(s.id));
 
   // If all skins are unlocked, pick from the full catalog
-  const pool = available.length > 0 ? available : SKIN_CATALOG;
+  const pool = available.length > 0 ? available : catalog;
 
-  // Pick rarity via weighted random
-  const roll = Math.random();
-  let rarity: Rarity;
-  if (roll < odds.common) {
-    rarity = 'common';
-  } else if (roll < odds.common + odds.rare) {
-    rarity = 'rare';
-  } else {
-    rarity = 'epic';
-  }
+  // Try to match the chest's rarity; if none available at that rarity, fall back to full pool
+  const rarityPool = pool.filter((s) => s.rarity === targetRarity);
+  const finalPool = rarityPool.length > 0 ? rarityPool : pool;
 
-  // Filter pool by rarity; fallback to full pool if none available at that rarity
-  let rarityPool = pool.filter((s) => s.rarity === rarity);
-  if (rarityPool.length === 0) rarityPool = pool;
-
-  return rarityPool[Math.floor(Math.random() * rarityPool.length)];
+  return finalPool[Math.floor(Math.random() * finalPool.length)];
 }

@@ -13,6 +13,7 @@ import { searchBook, getBookCoverUrl, fetchOpenLibraryCover } from '@/lib/google
 import { getCoverOverrideByIsbn, getCoverOverrideByTitleAuthor } from '@/data/coverOverrides';
 import { useCurrentBook } from '@/contexts/CurrentBookContext';
 import { useFavorites } from '@/contexts/FavoritesContext';
+import { useUser } from '@/contexts/UserContext';
 
 function LibraryContent() {
   const router = useRouter();
@@ -20,6 +21,7 @@ function LibraryContent() {
   const didInitFromQuery = useRef(false);
   const { setCurrentBook } = useCurrentBook();
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
+  const { canEditProgress } = useUser();
   const [categoryIndex, setCategoryIndex] = useState(0);
   const [bookIndex, setBookIndex] = useState(0);
   const [coverUrl, setCoverUrl] = useState<string | null>(null);
@@ -296,18 +298,20 @@ function LibraryContent() {
                 </div>
               </div>
 
-              <button onClick={handleStartReading} className="mt-4 w-[200px] relative">
-                <Image
-                  src="/assets/start.png"
-                  alt="Start Reading"
-                  width={1187}
-                  height={295}
-                  className="w-full h-auto"
-                />
-                <span className="absolute inset-0 flex items-center justify-center text-[18px] font-bold text-[#5A3C12]">
-                  Read
-                </span>
-              </button>
+              {canEditProgress && (
+                <button onClick={handleStartReading} className="mt-4 w-[200px] relative">
+                  <Image
+                    src="/assets/start.png"
+                    alt="Start Reading"
+                    width={1187}
+                    height={295}
+                    className="w-full h-auto"
+                  />
+                  <span className="absolute inset-0 flex items-center justify-center text-[18px] font-bold text-[#5A3C12]">
+                    Read
+                  </span>
+                </button>
+              )}
             </div>
           </div>
         </div>

@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { CurrentBookProvider } from "@/contexts/CurrentBookContext";
-import { FavoritesProvider } from "@/contexts/FavoritesContext";
-import { ChestProvider } from "@/contexts/ChestContext";
+import { UserProvider } from "@/contexts/UserContext";
+import UserDataProviders from "@/components/UserDataProviders";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,13 +36,11 @@ export default function RootLayout({
       >
         {/* App container - this is the frame boundary */}
         <div className="app-container">
-          <CurrentBookProvider>
-            <FavoritesProvider>
-              <ChestProvider>
-                {children}
-              </ChestProvider>
-            </FavoritesProvider>
-          </CurrentBookProvider>
+          <UserProvider>
+            <UserDataProviders>
+              {children}
+            </UserDataProviders>
+          </UserProvider>
         </div>
       </body>
     </html>

@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { createClient } from '@/lib/supabase/client';
 
 interface ChestContextType {
   unlockedSkins: string[];
@@ -13,55 +14,68 @@ interface ChestContextType {
 
 const ChestContext = createContext<ChestContextType | undefined>(undefined);
 
-export function ChestProvider({ children }: { children: ReactNode }) {
+export function ChestProvider({ children, userId }: { children: ReactNode; userId: string }) {
   const [unlockedSkins, setUnlockedSkins] = useState<string[]>([]);
   const [collectedChests, setCollectedChests] = useState<number[]>([]);
+  const supabase = createClient();
 
-  // Load from localStorage on mount
+  // Load from Supabase on mount / userId change
   useEffect(() => {
-    const savedSkins = localStorage.getItem('unlockedSkins');
-    const savedChests = localStorage.getItem('collectedChests');
+    async function load() {
+      const [skinsRes, chestsRes] = await Promise.all([
+        supabase
+          .from('unlocked_skins')
+          .select('skin_id')
+          .eq('user_id', userId),
+        supabase
+          .from('collected_chests')
+          .select('chest_goal')
+          .eq('user_id', userId),
+      ]);
 
-    if (savedSkins) {
-      try {
-        setUnlockedSkins(JSON.parse(savedSkins));
-      } catch (e) {
-        console.error('Failed to parse unlocked skins:', e);
-      }
+      if (skinsRes.error) console.error('Failed to load skins:', skinsRes.error);
+      if (chestsRes.error) console.error('Failed to load chests:', chestsRes.error);
+
+      setUnlockedSkins(skinsRes.data?.map((r) => r.skin_id) ?? []);
+      setCollectedChests(chestsRes.data?.map((r) => r.chest_goal) ?? []);
     }
+    load();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
 
-    if (savedChests) {
-      try {
-        setCollectedChests(JSON.parse(savedChests));
-      } catch (e) {
-        console.error('Failed to parse collected chests:', e);
-      }
-    }
-  }, []);
+  const unlockSkin = useCallback(
+    (skinId: string) => {
+      // Optimistic update
+      setUnlockedSkins((prev) => {
+        if (prev.includes(skinId)) return prev;
+        return [...prev, skinId];
+      });
 
-  // Persist unlocked skins
-  useEffect(() => {
-    localStorage.setItem('unlockedSkins', JSON.stringify(unlockedSkins));
-  }, [unlockedSkins]);
+      // Sync to Supabase
+      supabase
+        .from('unlocked_skins')
+        .upsert({ user_id: userId, skin_id: skinId }, { onConflict: 'user_id,skin_id' })
+        .then(({ error }) => { if (error) console.error('Failed to save skin:', error); });
+    },
+    [userId, supabase]
+  );
 
-  // Persist collected chests
-  useEffect(() => {
-    localStorage.setItem('collectedChests', JSON.stringify(collectedChests));
-  }, [collectedChests]);
+  const markChestCollected = useCallback(
+    (goal: number) => {
+      // Optimistic update
+      setCollectedChests((prev) => {
+        if (prev.includes(goal)) return prev;
+        return [...prev, goal];
+      });
 
-  const unlockSkin = useCallback((skinId: string) => {
-    setUnlockedSkins((prev) => {
-      if (prev.includes(skinId)) return prev;
-      return [...prev, skinId];
-    });
-  }, []);
-
-  const markChestCollected = useCallback((goal: number) => {
-    setCollectedChests((prev) => {
-      if (prev.includes(goal)) return prev;
-      return [...prev, goal];
-    });
-  }, []);
+      // Sync to Supabase
+      supabase
+        .from('collected_chests')
+        .upsert({ user_id: userId, chest_goal: goal }, { onConflict: 'user_id,chest_goal' })
+        .then(({ error }) => { if (error) console.error('Failed to save chest:', error); });
+    },
+    [userId, supabase]
+  );
 
   const isChestCollected = useCallback(
     (goal: number) => collectedChests.includes(goal),

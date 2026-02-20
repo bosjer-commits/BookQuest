@@ -30,29 +30,19 @@ function SectionTitle({ title }: { title: string }) {
   );
 }
 
-function EmptyFrame({ text, compact }: { text: string; compact?: boolean }) {
+function EmptyFrame({ text }: { text: string }) {
   return (
     <div
-      className={`relative w-full mx-auto ${compact ? 'max-w-[320px]' : 'max-w-[320px]'}`}
-      style={compact ? { height: '180px', overflow: 'hidden' } : undefined}
+      className="relative w-full mx-auto max-w-[320px]"
+      style={{ height: '180px', overflow: 'hidden' }}
     >
-      {compact ? (
-        <Image
-          src="/assets/chestframe.png"
-          alt=""
-          width={420}
-          height={200}
-          className="absolute left-1/2 top-1/2 h-[200px] w-[420px] -translate-x-1/2 -translate-y-1/2 object-contain"
-        />
-      ) : (
-        <Image
-          src="/assets/chestframe.png"
-          alt=""
-          width={320}
-          height={200}
-          className="w-full h-auto"
-        />
-      )}
+      <Image
+        src="/assets/chestframe.png"
+        alt=""
+        width={420}
+        height={200}
+        className="absolute left-1/2 top-1/2 h-[200px] w-[420px] -translate-x-1/2 -translate-y-1/2 object-contain"
+      />
       <div className="absolute inset-0 flex items-center justify-center">
         <div
           className="text-center font-bold brawl-text px-4 text-[18px]"
@@ -175,10 +165,6 @@ export default function FavoritesPage() {
   const { favorites } = useFavorites();
   const { inProgressBooks, finishedBooks } = useCurrentBook();
 
-  const isAllEmpty =
-    favorites.length === 0 && inProgressBooks.length === 0 && finishedBooks.length === 0;
-  const emptySectionClass = isAllEmpty ? 'space-y-4' : 'space-y-6';
-
   const handleSelect = (item: BookItem) => {
     const title = encodeURIComponent(item.book.title);
     const author = encodeURIComponent(item.book.author);
@@ -186,28 +172,39 @@ export default function FavoritesPage() {
   };
 
   return (
-    <div className="min-h-full flex flex-col">
-      <main className={`flex-1 px-6 pt-4 pb-0 ${emptySectionClass}`}>
-        <SectionTitle title="Favorites" />
-        {isAllEmpty ? (
-          <EmptyFrame text="No favourites yet" compact />
-        ) : (
-          <SectionGrid items={favorites} onSelect={handleSelect} />
-        )}
+    <div className="h-full flex flex-col">
+      <main className="flex-1 flex flex-col px-6 pt-3" style={{ paddingBottom: '80px' }}>
 
-        <SectionTitle title="In Progress" />
-        {inProgressBooks.length === 0 ? (
-          <EmptyFrame text="No books in progress" compact={isAllEmpty} />
-        ) : (
-          <SectionGrid items={inProgressBooks} onSelect={handleSelect} />
-        )}
+        {/* Favorites */}
+        <div className="flex-1 min-h-0 flex flex-col items-center justify-center gap-2">
+          <SectionTitle title="Favorites" />
+          {favorites.length === 0 ? (
+            <EmptyFrame text="No favourites yet" />
+          ) : (
+            <SectionGrid items={favorites} onSelect={handleSelect} />
+          )}
+        </div>
 
-        <SectionTitle title="Finished" />
-        {finishedBooks.length === 0 ? (
-          <EmptyFrame text="No books finished" compact={isAllEmpty} />
-        ) : (
-          <SectionGrid items={finishedBooks} onSelect={handleSelect} />
-        )}
+        {/* In Progress */}
+        <div className="flex-1 min-h-0 flex flex-col items-center justify-center gap-2">
+          <SectionTitle title="In Progress" />
+          {inProgressBooks.length === 0 ? (
+            <EmptyFrame text="No books in progress" />
+          ) : (
+            <SectionGrid items={inProgressBooks} onSelect={handleSelect} />
+          )}
+        </div>
+
+        {/* Finished */}
+        <div className="flex-1 min-h-0 flex flex-col items-center justify-center gap-2">
+          <SectionTitle title="Finished" />
+          {finishedBooks.length === 0 ? (
+            <EmptyFrame text="No books finished" />
+          ) : (
+            <SectionGrid items={finishedBooks} onSelect={handleSelect} />
+          )}
+        </div>
+
       </main>
 
       <BottomNav active="favorites" />
