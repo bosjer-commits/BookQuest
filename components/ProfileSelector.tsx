@@ -3,23 +3,19 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { USERS, type UserProfile } from '@/data/users';
-import { SKIN_CATALOG } from '@/data/skins';
 import { useUser } from '@/contexts/UserContext';
 import PinModal from '@/components/PinModal';
 
 const KID_IDS = ['elliott', 'robin', 'simon', 'oliver', 'lucas'];
 const PARENT_IDS = ['fanny', 'fie', 'jo'];
 
-function getKidAvatar(name: string): string {
-  const skin = SKIN_CATALOG.find(
-    (s) => s.owner.toLowerCase() === name.toLowerCase()
-  );
-  return skin?.asset ?? '/assets/Skins/Elliott/Spike.png';
+function getProfileImage(name: string): string {
+  return `/assets/Skins/${name}_profile.png`;
 }
 
 function ProfileCard({ profile, onSelect }: { profile: UserProfile; onSelect: () => void }) {
   const isKid = profile.role === 'kid';
-  const avatarSrc = isKid ? getKidAvatar(profile.name) : null;
+  const avatarSrc = getProfileImage(profile.name);
 
   return (
     <button
@@ -41,25 +37,13 @@ function ProfileCard({ profile, onSelect }: { profile: UserProfile; onSelect: ()
             : '0 0 16px rgba(162,155,254,0.5)',
         }}
       >
-        {avatarSrc ? (
-          <Image
-            src={avatarSrc}
-            alt={profile.name}
-            width={90}
-            height={90}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <span
-            className="text-2xl font-black"
-            style={{
-              color: '#E5C8FF',
-              textShadow: '0 2px 8px rgba(162,155,254,0.8)',
-            }}
-          >
-            {profile.name.slice(0, 2).toUpperCase()}
-          </span>
-        )}
+        <Image
+          src={avatarSrc}
+          alt={profile.name}
+          width={90}
+          height={90}
+          className="w-full h-full object-cover"
+        />
       </div>
       <span
         className="text-sm font-bold brawl-text"

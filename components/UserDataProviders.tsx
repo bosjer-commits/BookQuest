@@ -4,7 +4,7 @@ import { ReactNode, useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useUser } from '@/contexts/UserContext';
 import { USERS } from '@/data/users';
-import { SKIN_CATALOG, CHEST_TIERS } from '@/data/skins';
+import { CHEST_TIERS } from '@/data/skins';
 import { CurrentBookProvider } from '@/contexts/CurrentBookContext';
 import { FavoritesProvider } from '@/contexts/FavoritesContext';
 import { ChestProvider } from '@/contexts/ChestContext';
@@ -13,10 +13,7 @@ import ChestOpeningModal from '@/components/ChestOpeningModal';
 import { createClient } from '@/lib/supabase/client';
 
 function getKidAvatar(name: string): string {
-  const skin = SKIN_CATALOG.find(
-    (s) => s.owner.toLowerCase() === name.toLowerCase()
-  );
-  return skin?.asset ?? '/assets/Skins/Elliott/Spike.png';
+  return `/assets/Skins/${name}_profile.png`;
 }
 
 function KidPicker() {

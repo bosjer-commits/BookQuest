@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { type UserProfile } from '@/data/users';
-import { SKIN_CATALOG } from '@/data/skins';
 
 interface PinModalProps {
   profile: UserProfile;
@@ -16,9 +15,7 @@ export default function PinModal({ profile, onSuccess, onCancel }: PinModalProps
   const [error, setError] = useState(false);
 
   const isKid = profile.role === 'kid';
-  const avatarSrc = isKid
-    ? (SKIN_CATALOG.find((s) => s.owner.toLowerCase() === profile.name.toLowerCase())?.asset ?? null)
-    : null;
+  const avatarSrc = `/assets/Skins/${profile.name}_profile.png`;
 
   useEffect(() => {
     if (digits.length === 4) {
@@ -78,22 +75,13 @@ export default function PinModal({ profile, onSuccess, onCancel }: PinModalProps
               : '0 0 16px rgba(162,155,254,0.5)',
           }}
         >
-          {avatarSrc ? (
-            <Image
-              src={avatarSrc}
-              alt={profile.name}
-              width={90}
-              height={90}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <span
-              className="text-2xl font-black"
-              style={{ color: '#E5C8FF', textShadow: '0 2px 8px rgba(162,155,254,0.8)' }}
-            >
-              {profile.name.slice(0, 2).toUpperCase()}
-            </span>
-          )}
+          <Image
+            src={avatarSrc}
+            alt={profile.name}
+            width={90}
+            height={90}
+            className="w-full h-full object-cover"
+          />
         </div>
         <span
           className="text-base font-bold brawl-text"

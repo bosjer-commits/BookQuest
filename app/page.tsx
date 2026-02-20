@@ -7,7 +7,6 @@ import BottomNav from '@/components/BottomNav';
 import { useCurrentBook } from '@/contexts/CurrentBookContext';
 import { useChest } from '@/contexts/ChestContext';
 import { useUser } from '@/contexts/UserContext';
-import { SKIN_CATALOG } from '@/data/skins';
 import ChestOpeningModal from '@/components/ChestOpeningModal';
 
 export default function Home() {
@@ -41,7 +40,7 @@ export default function Home() {
 
   // Avatar image for floating user button
   const avatarSkin = viewingProfile
-    ? SKIN_CATALOG.find((s) => s.owner.toLowerCase() === viewingProfile.name.toLowerCase())?.asset
+    ? `/assets/Skins/${viewingProfile.name}_profile.png`
     : null;
 
   return (
@@ -60,12 +59,8 @@ export default function Home() {
         }}
         aria-label="User menu"
       >
-        {avatarSkin ? (
+        {avatarSkin && (
           <Image src={avatarSkin} alt={viewingProfile?.name ?? ''} width={40} height={40} className="w-full h-full object-cover" />
-        ) : (
-          <span className="text-xs font-black" style={{ color: '#7EC3FF' }}>
-            {viewingProfile?.name?.slice(0, 1) ?? '?'}
-          </span>
         )}
       </button>
 
