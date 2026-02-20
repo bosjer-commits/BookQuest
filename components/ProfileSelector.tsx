@@ -76,51 +76,48 @@ export default function ProfileSelector() {
       className="fixed inset-0 flex flex-col items-center justify-center z-50"
       style={{ background: 'var(--navy)' }}
     >
-      {/* Decorative glow */}
-      <div
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[200px] pointer-events-none"
-        style={{
-          background: 'radial-gradient(ellipse at center top, rgba(116,185,255,0.15) 0%, transparent 70%)',
-        }}
-      />
-
-      <h1
-        className="text-3xl font-black brawl-text mb-2"
-        style={{
-          color: '#F6D58A',
-          textShadow: '-2px 0 #5A3C12, 2px 0 #5A3C12, 0 -2px #5A3C12, 0 2px #5A3C12',
-        }}
-      >
-        Book Quest
-      </h1>
-      <p
-        className="text-base font-bold brawl-text mb-8"
-        style={{ color: '#7EC3FF' }}
-      >
-        Who&apos;s reading today?
-      </p>
-
-      {/* Kids grid */}
-      <div className="flex flex-wrap justify-center gap-5 mb-6 px-4 max-w-[380px]">
-        {kids.map((kid) => (
-          <ProfileCard key={kid.id} profile={kid} onSelect={() => setPendingProfile(kid)} />
-        ))}
+      {/* BookQuest logo — behind profiles */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <Image
+          src="/assets/Skins/BookQuest.png"
+          alt=""
+          width={500}
+          height={500}
+          className="w-[340px] h-auto opacity-20"
+        />
       </div>
 
-      {/* Divider */}
-      <div className="flex items-center gap-3 mb-6 w-[280px]">
-        <div className="flex-1 h-px" style={{ background: 'rgba(116,185,255,0.3)' }} />
-        <span className="text-xs font-bold brawl-text" style={{ color: 'rgba(116,185,255,0.6)' }}>
-          PARENTS
-        </span>
-        <div className="flex-1 h-px" style={{ background: 'rgba(116,185,255,0.3)' }} />
-      </div>
+      {/* Content sits above the logo */}
+      <div className="relative z-10 flex flex-col items-center">
+        <p
+          className="text-base font-bold brawl-text mb-8"
+          style={{ color: '#7EC3FF' }}
+        >
+          Who&apos;s reading today?
+        </p>
 
-      {/* Parents row */}
-      <div className="flex justify-center gap-6">
-        {parents.map((parent) => (
-          <ProfileCard key={parent.id} profile={parent} onSelect={() => setPendingProfile(parent)} />
-        ))}
+        {/* Kids grid */}
+        <div className="flex flex-wrap justify-center gap-5 mb-6 px-4 max-w-[380px]">
+          {kids.map((kid) => (
+            <ProfileCard key={kid.id} profile={kid} onSelect={() => setPendingProfile(kid)} />
+          ))}
+        </div>
+
+        {/* Divider */}
+        <div className="flex items-center gap-3 mb-6 w-[280px]">
+          <div className="flex-1 h-px" style={{ background: 'rgba(116,185,255,0.3)' }} />
+          <span className="text-xs font-bold brawl-text" style={{ color: 'rgba(116,185,255,0.6)' }}>
+            PARENTS
+          </span>
+          <div className="flex-1 h-px" style={{ background: 'rgba(116,185,255,0.3)' }} />
+        </div>
+
+        {/* Parents row */}
+        <div className="flex justify-center gap-6">
+          {parents.map((parent) => (
+            <ProfileCard key={parent.id} profile={parent} onSelect={() => setPendingProfile(parent)} />
+          ))}
+        </div>
       </div>
     </div>
   );
