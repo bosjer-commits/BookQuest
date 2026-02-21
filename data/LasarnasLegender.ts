@@ -1,7 +1,7 @@
 import { Book } from './deGoudenGriffel';
 
 export const lasarnasLegender: Book[] = [
-  { year: 1997, title: 'Harry Potter och De vises sten', author: 'J.K. Rowling', ageRange: '9–12', summary: 'Harry får veta att han är en trollkarl och börjar på Hogwarts. Där möter han både vänskap och stora faror. Magisk, spännande och full av äventyr.', cover: '/covers/Lasarnas Legender/harry_potter_och_de_vises_sten.jpg' },
+  { year: 1997, title: 'Harry Potter och De vises sten', author: 'J.K. Rowling', ageRange: '9–12', summary: 'Harry får veta att han är en trollkarl och börjar på Hogwarts. Där möter han både vänskap och faror. Magisk, spännande och full av äventyr.', cover: '/covers/Lasarnas Legender/harry_potter_och_de_vises_sten.jpg' },
   { year: 1950, title: 'Berättelsen om Narnia (hela serien)', author: 'C.S. Lewis', ageRange: '8–12', summary: 'Barn kliver in i landet Narnia där djur talar och magi finns överallt. De dras in i kampen mellan gott och ont. Storslagen, magisk och äventyrlig.', cover: '/covers/Grote Vriendelijke/De_complete_kronieken_van_Narnia.jpg' },
   { year: 1945, title: 'Pippi Långstrump', author: 'Astrid Lindgren', ageRange: '6–9', summary: 'Pippi bor själv i Villa Villekulla och gör allt på sitt eget sätt. Rolig, fri och ikonisk.', cover: '/covers/Lasarnas Legender/pippi_langstrump.jpg' },
   { year: 1964, title: 'Kalle och chokladfabriken', author: 'Roald Dahl', ageRange: '7–10', summary: 'Sjakie vinner en biljett till den fantastiska chokladfabriken. De andra barnens girighet får konsekvenser, men han behåller sitt hjärta. Rolig, magisk och spännande.', cover: '/covers/Lasarnas Legender/kalle_och_chokladfabriken.jpg' },
