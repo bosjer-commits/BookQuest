@@ -156,19 +156,13 @@ export default function Home() {
                 )}
               </button>
             ) : (
-              canEditProgress ? (
-                <button
-                  onClick={() => router.push('/library')}
-                  className="absolute inset-[10%] z-[1] flex items-center justify-center rounded bg-white/10 border-2 border-white/40"
-                  aria-label="Add a book"
-                >
-                  <span className="text-white text-6xl font-bold leading-none">+</span>
-                </button>
-              ) : (
-                <div className="absolute inset-[10%] z-[1] flex items-center justify-center rounded bg-white/10 border-2 border-white/40">
-                  <span className="text-white text-4xl font-bold leading-none opacity-30">📖</span>
-                </div>
-              )
+              <button
+                onClick={() => router.push('/library')}
+                className="absolute inset-[10%] z-[1] flex items-center justify-center rounded bg-white/10 border-2 border-white/40"
+                aria-label="Add a book"
+              >
+                <span className="text-white text-6xl font-bold leading-none">+</span>
+              </button>
             )}
 
             <img
