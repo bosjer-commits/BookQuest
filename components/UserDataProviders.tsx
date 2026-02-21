@@ -147,57 +147,39 @@ function WelcomeFlow({ userId, children }: { userId: string; children: ReactNode
   // step === 'welcome'
   return (
     <div
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden"
+      className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden"
       style={{ background: '#162544' }}
     >
-      {/* Top glow */}
-      <div
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[300px] pointer-events-none"
-        style={{
-          background:
-            'radial-gradient(ellipse at center top, rgba(116,185,255,0.18) 0%, transparent 65%)',
-        }}
-      />
-
-      {/* Animated chest */}
-      <div className="relative mb-2" style={{ width: 260 }}>
+      <div className="relative w-full h-full max-w-[500px] mx-auto">
+        {/* Background image */}
         <img
-          src={CHEST_TIERS.brawl.swirlAnimation}
-          alt="Chest"
-          style={{ width: '100%', height: 'auto', objectFit: 'contain' }}
+          src="/assets/openfirstchest.webp"
+          alt="Welcome to Book Quest"
+          className="w-full h-full object-contain"
+        />
+        {/* Chest in the center — tappable */}
+        <button
+          type="button"
+          onClick={() => setStep('chest')}
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+          style={{ width: '55%' }}
+          aria-label="Open your first chest"
+        >
+          <img
+            src={CHEST_TIERS.brawl.swirlAnimation}
+            alt="Chest"
+            className="w-full h-auto"
+          />
+        </button>
+        {/* "Open your first chest!" banner hotspot */}
+        <button
+          type="button"
+          onClick={() => setStep('chest')}
+          className="absolute left-1/2 -translate-x-1/2"
+          style={{ bottom: '12%', width: '80%', height: '7%', background: 'transparent', border: 'none', cursor: 'pointer' }}
+          aria-label="Open your first chest"
         />
       </div>
-
-      {/* Welcome text */}
-      <h1
-        className="text-3xl font-black brawl-text text-center leading-tight mb-2"
-        style={{
-          color: '#F6D58A',
-          textShadow: '-2px 0 #5A3C12, 2px 0 #5A3C12, 0 -2px #5A3C12, 0 2px #5A3C12',
-        }}
-      >
-        Welcome to BookQuest!
-      </h1>
-      <p
-        className="text-base font-bold brawl-text mb-8"
-        style={{ color: '#7EC3FF' }}
-      >
-        Open your first chest.
-      </p>
-
-      {/* CTA button */}
-      <button
-        type="button"
-        onClick={() => setStep('chest')}
-        className="px-10 py-4 rounded-full font-black text-lg border-2 border-white"
-        style={{
-          background: 'linear-gradient(to bottom, #FDCB6E 0%, #FFA502 100%)',
-          color: '#1A1F3A',
-          boxShadow: '0 4px 0 rgba(0,0,0,0.35), 0 6px 16px rgba(0,0,0,0.3)',
-        }}
-      >
-        Open my first chest!
-      </button>
     </div>
   );
 }
