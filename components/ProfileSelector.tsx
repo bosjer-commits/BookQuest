@@ -1,65 +1,33 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import { USERS, type UserProfile } from '@/data/users';
 import { useUser } from '@/contexts/UserContext';
 import PinModal from '@/components/PinModal';
 
-const KID_IDS = ['elliott', 'robin', 'simon', 'oliver', 'lucas'];
-const PARENT_IDS = ['fanny', 'fie', 'jo'];
-
-function getProfileImage(name: string): string {
-  return `/assets/Skins/${name}_profile.png`;
-}
-
-function ProfileCard({ profile, onSelect }: { profile: UserProfile; onSelect: () => void }) {
-  const isKid = profile.role === 'kid';
-  const avatarSrc = getProfileImage(profile.name);
-
-  return (
-    <button
-      type="button"
-      onClick={onSelect}
-      className="flex flex-col items-center gap-2 focus:outline-none"
-    >
-      <div
-        className="relative rounded-2xl overflow-hidden flex items-center justify-center"
-        style={{
-          width: '90px',
-          height: '90px',
-          background: isKid
-            ? 'radial-gradient(ellipse at center, #3d8ba8 0%, #1a3a52 100%)'
-            : 'linear-gradient(135deg, #4a3b6b 0%, #2d1f4a 100%)',
-          border: isKid ? '3px solid #74B9FF' : '3px solid #A29BFE',
-          boxShadow: isKid
-            ? '0 0 16px rgba(116,185,255,0.5)'
-            : '0 0 16px rgba(162,155,254,0.5)',
-        }}
-      >
-        <Image
-          src={avatarSrc}
-          alt={profile.name}
-          width={90}
-          height={90}
-          className="w-full h-full object-cover"
-        />
-      </div>
-      <span
-        className="text-sm font-bold brawl-text"
-        style={{ color: isKid ? '#7EC3FF' : '#C8B4FF' }}
-      >
-        {profile.name}
-      </span>
-    </button>
-  );
-}
+// Hotspot positions as percentages of the image (top, left, width, height)
+const HOTSPOTS: { id: string; top: number; left: number; width: number; height: number }[] = [
+  // Row 1: Elliott, Robin, Simon
+  { id: 'elliott', top: 22, left: 4,  width: 30, height: 16 },
+  { id: 'robin',   top: 22, left: 35, width: 30, height: 16 },
+  { id: 'simon',   top: 22, left: 66, width: 30, height: 16 },
+  // Row 2: Oliver, Lucas
+  { id: 'oliver',  top: 40, left: 14, width: 30, height: 16 },
+  { id: 'lucas',   top: 40, left: 52, width: 30, height: 16 },
+  // Row 3: Fanny, Fie, Jo
+  { id: 'fanny',   top: 66, left: 4,  width: 30, height: 18 },
+  { id: 'fie',     top: 66, left: 35, width: 30, height: 18 },
+  { id: 'jo',      top: 66, left: 66, width: 30, height: 18 },
+];
 
 export default function ProfileSelector() {
   const { login } = useUser();
   const [pendingProfile, setPendingProfile] = useState<UserProfile | null>(null);
-  const kids = USERS.filter((u) => KID_IDS.includes(u.id));
-  const parents = USERS.filter((u) => PARENT_IDS.includes(u.id));
+
+  const handleSelect = (id: string) => {
+    const profile = USERS.find((u) => u.id === id);
+    if (profile) setPendingProfile(profile);
+  };
 
   if (pendingProfile) {
     return (
@@ -73,51 +41,34 @@ export default function ProfileSelector() {
 
   return (
     <div
-      className="fixed inset-0 flex flex-col items-center justify-center z-50"
+      className="fixed inset-0 flex items-center justify-center z-50"
       style={{ background: 'var(--navy)' }}
     >
-      {/* BookQuest logo — behind profiles */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <Image
-          src="/assets/Skins/BookQuest.png"
-          alt=""
-          width={500}
-          height={500}
-          className="w-[340px] h-auto opacity-20"
+      <div className="relative w-full h-full max-w-[500px] mx-auto">
+        <img
+          src="/assets/landingpage.png"
+          alt="Book Quest - Who's reading today?"
+          className="w-full h-full object-contain"
         />
-      </div>
-
-      {/* Content sits above the logo */}
-      <div className="relative z-10 flex flex-col items-center">
-        <p
-          className="text-base font-bold brawl-text mb-8"
-          style={{ color: '#7EC3FF' }}
-        >
-          Who&apos;s reading today?
-        </p>
-
-        {/* Kids grid */}
-        <div className="flex flex-wrap justify-center gap-5 mb-6 px-4 max-w-[380px]">
-          {kids.map((kid) => (
-            <ProfileCard key={kid.id} profile={kid} onSelect={() => setPendingProfile(kid)} />
-          ))}
-        </div>
-
-        {/* Divider */}
-        <div className="flex items-center gap-3 mb-6 w-[280px]">
-          <div className="flex-1 h-px" style={{ background: 'rgba(116,185,255,0.3)' }} />
-          <span className="text-xs font-bold brawl-text" style={{ color: 'rgba(116,185,255,0.6)' }}>
-            PARENTS
-          </span>
-          <div className="flex-1 h-px" style={{ background: 'rgba(116,185,255,0.3)' }} />
-        </div>
-
-        {/* Parents row */}
-        <div className="flex justify-center gap-6">
-          {parents.map((parent) => (
-            <ProfileCard key={parent.id} profile={parent} onSelect={() => setPendingProfile(parent)} />
-          ))}
-        </div>
+        {/* Invisible hotspot buttons over each character */}
+        {HOTSPOTS.map((spot) => (
+          <button
+            key={spot.id}
+            type="button"
+            onClick={() => handleSelect(spot.id)}
+            aria-label={`Select ${spot.id}`}
+            className="absolute"
+            style={{
+              top: `${spot.top}%`,
+              left: `${spot.left}%`,
+              width: `${spot.width}%`,
+              height: `${spot.height}%`,
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+          />
+        ))}
       </div>
     </div>
   );
