@@ -137,20 +137,22 @@ export default function CharacterShowcase({ skins, name, activeIndex, onIndexCha
         }}
       />
 
-      <button
-        type="button"
-        onClick={handlePrev}
-        className="absolute -left-5 top-1/2 -translate-y-1/2 w-14 h-14 flex items-center justify-center z-30"
-        aria-label="Previous skin"
-      >
-        <Image
-          src="/assets/blueleft.png"
-          alt=""
-          width={56}
-          height={56}
-          className="w-14 h-14 object-contain"
-        />
-      </button>
+      {skins.length > 1 && (
+        <button
+          type="button"
+          onClick={handlePrev}
+          className="absolute -left-5 top-1/2 -translate-y-1/2 w-14 h-14 flex items-center justify-center z-30"
+          aria-label="Previous skin"
+        >
+          <Image
+            src="/assets/blueleft.png"
+            alt=""
+            width={56}
+            height={56}
+            className="w-14 h-14 object-contain"
+          />
+        </button>
+      )}
 
       <div
         className="absolute left-1/2 top-1/2 w-full h-full flex items-center justify-center z-20"
@@ -185,20 +187,22 @@ export default function CharacterShowcase({ skins, name, activeIndex, onIndexCha
         </div>
       </div>
 
-      <button
-        type="button"
-        onClick={handleNext}
-        className="absolute -right-5 top-1/2 -translate-y-1/2 w-14 h-14 flex items-center justify-center z-30"
-        aria-label="Next skin"
-      >
-        <Image
-          src="/assets/blueright.png"
-          alt=""
-          width={56}
-          height={56}
-          className="w-14 h-14 object-contain"
-        />
-      </button>
+      {skins.length > 1 && (
+        <button
+          type="button"
+          onClick={handleNext}
+          className="absolute -right-5 top-1/2 -translate-y-1/2 w-14 h-14 flex items-center justify-center z-30"
+          aria-label="Next skin"
+        >
+          <Image
+            src="/assets/blueright.png"
+            alt=""
+            width={56}
+            height={56}
+            className="w-14 h-14 object-contain"
+          />
+        </button>
+      )}
 
       {/* Top accent border glow */}
       <div

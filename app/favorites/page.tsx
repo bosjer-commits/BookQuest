@@ -15,73 +15,40 @@ type BookItem = {
   coverUrl?: string;
 };
 
-function SectionTitle({ title }: { title: string }) {
-  return (
-    <h2
-      className="text-center text-[22px] font-bold brawl-text"
-      style={{
-        color: '#F6D58A',
-        textShadow:
-          '-2px 0 #5A3C12, 2px 0 #5A3C12, 0 -2px #5A3C12, 0 2px #5A3C12',
-      }}
-    >
-      {title}
-    </h2>
-  );
-}
-
-function EmptyFrame({ text }: { text: string }) {
-  return (
-    <div
-      className="relative w-full mx-auto max-w-[320px]"
-      style={{ height: '180px', overflow: 'hidden' }}
-    >
-      <Image
-        src="/assets/chestframe.png"
-        alt=""
-        width={420}
-        height={200}
-        className="absolute left-1/2 top-1/2 h-[200px] w-[420px] -translate-x-1/2 -translate-y-1/2 object-contain"
-      />
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div
-          className="text-center font-bold brawl-text px-4 text-[18px]"
-          style={{
-            color: '#F6D58A',
-            textShadow:
-              '-2px 0 #5A3C12, 2px 0 #5A3C12, 0 -2px #5A3C12, 0 2px #5A3C12',
-          }}
-        >
-          {text}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function BookFrame({
-  coverUrl,
+function BookSlot({
+  item,
   onClick,
 }: {
-  coverUrl?: string;
+  item?: BookItem;
   onClick?: () => void;
 }) {
   return (
     <button
       type="button"
-      onClick={onClick}
-      className="relative w-[120px] h-[180px] cursor-pointer"
+      onClick={item ? onClick : undefined}
+      className="relative w-[90px] h-[130px]"
+      style={{ cursor: item ? 'pointer' : 'default' }}
     >
       <div className="absolute inset-[8%] z-[1]">
-        {coverUrl ? (
+        {item?.coverUrl ? (
           <img
-            src={coverUrl}
-            alt=""
+            src={item.coverUrl}
+            alt={item.book.title}
             className="w-full h-full object-cover rounded block"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center rounded bg-[#2B4E6E]">
-            <span className="text-[28px] font-bold text-[#F6D58A]">+</span>
+          <div
+            className="w-full h-full flex items-center justify-center rounded"
+            style={{
+              background: 'rgba(43, 78, 110, 0.5)',
+              border: '2px dashed rgba(246, 213, 138, 0.3)',
+            }}
+          >
+            {item && !item.coverUrl ? (
+              <span className="text-[10px] text-center text-[#F6D58A] font-bold px-1 leading-tight">
+                {item.book.title}
+              </span>
+            ) : null}
           </div>
         )}
       </div>
@@ -94,68 +61,78 @@ function BookFrame({
   );
 }
 
-function SectionGrid({
+function Section({
+  title,
   items,
   onSelect,
 }: {
+  title: string;
   items: BookItem[];
   onSelect: (item: BookItem) => void;
 }) {
-  const [startIndex, setStartIndex] = useState(0);
-  const visible = items.slice(startIndex, startIndex + 3);
-  const showArrow = items.length > 3;
-  const canGoNext = startIndex + 3 < items.length;
-  const canGoPrev = startIndex > 0;
+  const [page, setPage] = useState(0);
+  const totalPages = Math.max(1, Math.ceil(items.length / 3));
+  const canPrev = page > 0;
+  const canNext = page < totalPages - 1;
+  const visible = items.slice(page * 3, page * 3 + 3);
+
+  // Always show 3 slots
+  const slots: (BookItem | undefined)[] = [
+    visible[0],
+    visible[1],
+    visible[2],
+  ];
 
   return (
-    <div className="relative">
-      <div className="grid grid-cols-3 gap-3 justify-items-center">
-        {visible.map((item, index) => (
-          <div
-            key={index}
-            style={{
-              transform: index === 0 ? 'translateX(-20px)' : index === 2 ? 'translateX(20px)' : 'none'
-            }}
+    <div className="flex flex-col items-center gap-1">
+      {/* Title with arrows */}
+      <div className="flex items-center gap-3">
+        {items.length > 3 ? (
+          <button
+            type="button"
+            onClick={() => canPrev && setPage((p) => p - 1)}
+            style={{ opacity: canPrev ? 1 : 0.3 }}
+            aria-label={`Previous ${title}`}
           >
-            <BookFrame coverUrl={item.coverUrl} onClick={() => onSelect(item)} />
-          </div>
-        ))}
-        {visible.length < 3 &&
-          Array.from({ length: 3 - visible.length }).map((_, index) => (
-            <div key={`empty-${index}`} className="w-[120px] h-[180px]" />
-          ))}
+            <Image src="/assets/yellowleft.png" alt="" width={28} height={28} className="w-7 h-7 object-contain" />
+          </button>
+        ) : (
+          <div className="w-7" />
+        )}
+        <h2
+          className="text-center text-[18px] font-bold brawl-text"
+          style={{
+            color: '#F6D58A',
+            textShadow:
+              '-2px 0 #5A3C12, 2px 0 #5A3C12, 0 -2px #5A3C12, 0 2px #5A3C12',
+          }}
+        >
+          {title}
+        </h2>
+        {items.length > 3 ? (
+          <button
+            type="button"
+            onClick={() => canNext && setPage((p) => p + 1)}
+            style={{ opacity: canNext ? 1 : 0.3 }}
+            aria-label={`Next ${title}`}
+          >
+            <Image src="/assets/yellowright.png" alt="" width={28} height={28} className="w-7 h-7 object-contain" />
+          </button>
+        ) : (
+          <div className="w-7" />
+        )}
       </div>
 
-      {showArrow && (
-        <>
-          <button
-            type="button"
-            onClick={() => {
-              if (!canGoPrev) return;
-              setStartIndex((prev) => Math.max(prev - 3, 0));
-            }}
-            className="absolute left-[-36px] top-1/2 -translate-y-1/2"
-            aria-label="Previous books"
-            disabled={!canGoPrev}
-            style={{ opacity: canGoPrev ? 1 : 0.5 }}
-          >
-            <Image src="/assets/blueleft.png" alt="" width={36} height={36} />
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              if (!canGoNext) return;
-              setStartIndex((prev) => Math.min(prev + 3, items.length - 3));
-            }}
-            className="absolute right-[-36px] top-1/2 -translate-y-1/2"
-            aria-label="Next books"
-            disabled={!canGoNext}
-            style={{ opacity: canGoNext ? 1 : 0.5 }}
-          >
-            <Image src="/assets/blueright.png" alt="" width={36} height={36} />
-          </button>
-        </>
-      )}
+      {/* 3 book slots */}
+      <div className="flex items-center justify-center gap-2">
+        {slots.map((slot, i) => (
+          <BookSlot
+            key={`${page}-${i}`}
+            item={slot}
+            onClick={slot ? () => onSelect(slot) : undefined}
+          />
+        ))}
+      </div>
     </div>
   );
 }
@@ -172,39 +149,14 @@ export default function FavoritesPage() {
   };
 
   return (
-    <div className="h-full flex flex-col">
-      <main className="flex-1 flex flex-col px-6 pt-3" style={{ paddingBottom: '80px' }}>
-
-        {/* Favorites */}
-        <div className="flex-1 min-h-0 flex flex-col items-center justify-center gap-2">
-          <SectionTitle title="Favorites" />
-          {favorites.length === 0 ? (
-            <EmptyFrame text="No favourites yet" />
-          ) : (
-            <SectionGrid items={favorites} onSelect={handleSelect} />
-          )}
-        </div>
-
-        {/* In Progress */}
-        <div className="flex-1 min-h-0 flex flex-col items-center justify-center gap-2">
-          <SectionTitle title="In Progress" />
-          {inProgressBooks.length === 0 ? (
-            <EmptyFrame text="No books in progress" />
-          ) : (
-            <SectionGrid items={inProgressBooks} onSelect={handleSelect} />
-          )}
-        </div>
-
-        {/* Finished */}
-        <div className="flex-1 min-h-0 flex flex-col items-center justify-center gap-2">
-          <SectionTitle title="Finished" />
-          {finishedBooks.length === 0 ? (
-            <EmptyFrame text="No books finished" />
-          ) : (
-            <SectionGrid items={finishedBooks} onSelect={handleSelect} />
-          )}
-        </div>
-
+    <div className="h-full flex flex-col overflow-hidden">
+      <main
+        className="flex-1 flex flex-col items-center justify-evenly px-4 pt-1 overflow-hidden min-h-0"
+        style={{ paddingBottom: 'var(--nav-height)' }}
+      >
+        <Section title="Favorites" items={favorites} onSelect={handleSelect} />
+        <Section title="In Progress" items={inProgressBooks} onSelect={handleSelect} />
+        <Section title="Finished" items={finishedBooks} onSelect={handleSelect} />
       </main>
 
       <BottomNav active="favorites" />

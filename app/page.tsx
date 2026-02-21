@@ -44,7 +44,7 @@ export default function Home() {
     : null;
 
   return (
-    <div className="min-h-full flex flex-col">
+    <div className="h-full flex flex-col overflow-hidden">
       {/* Floating user avatar button */}
       <button
         type="button"
@@ -112,19 +112,19 @@ export default function Home() {
       )}
 
       <main
-        className="flex-1 flex flex-col items-center justify-start px-4 pt-4 pb-0 space-y-6"
-        style={{ paddingBottom: '72px' }}
+        className="flex-1 flex flex-col items-center px-4 pt-4 pb-0 gap-2 overflow-hidden min-h-0"
+        style={{ paddingBottom: 'var(--nav-height)' }}
       >
         {/* Parent mode indicator */}
         {isParentMode && (
           <div
-            className="w-full max-w-[320px] text-center text-xs font-bold brawl-text rounded-full py-1 px-3"
+            className="w-full max-w-[320px] text-center text-xs font-bold brawl-text rounded-full py-1 px-3 shrink-0"
             style={{
               color: '#C8B4FF',
               background: 'rgba(162,155,254,0.15)',
               border: '1px solid rgba(162,155,254,0.3)',
-              marginTop: '8px',
-              marginBottom: '-16px',
+              marginTop: '-14px',
+              marginBottom: '-8px',
             }}
           >
             Managing: {viewingProfile?.name}
@@ -132,11 +132,16 @@ export default function Home() {
         )}
 
         {/* Book Frame */}
-        <div className="w-full flex justify-center" style={{ marginTop: '-5px' }}>
-          <div className="relative">
-            <div className="relative mx-auto" style={{ width: '280px', height: '400px' }}>
+        <div className="w-full flex justify-center flex-1 min-h-0" style={{ marginTop: '-5px' }}>
+          <div className="relative h-full flex items-center justify-center">
+            <div className="relative mx-auto" style={{ aspectRatio: '280 / 400', maxWidth: '280px', maxHeight: '400px', height: '100%' }}>
             {hasCurrentBook ? (
-              <div className="absolute" style={{ top: '8%', right: '8%', bottom: '6%', left: '8%', zIndex: 1 }}>
+              <button
+                onClick={() => router.push('/library')}
+                className="absolute cursor-pointer"
+                style={{ top: '8%', right: '8%', bottom: '6%', left: '8%', zIndex: 1, padding: 0, background: 'none', border: 'none' }}
+                aria-label="Go to library"
+              >
                 {currentBook?.coverUrl ? (
                   <img
                     src={currentBook.coverUrl}
@@ -149,7 +154,7 @@ export default function Home() {
                     <p className="text-white text-sm font-bold text-center">{currentBook?.book.title}</p>
                   </div>
                 )}
-              </div>
+              </button>
             ) : (
               canEditProgress ? (
                 <button
@@ -187,30 +192,29 @@ export default function Home() {
         </div>
 
         {/* Progress Bar */}
-        <div className="relative w-full max-w-[320px] flex items-center justify-center" style={{ marginTop: '-13px' }}>
+        <div className="relative w-full max-w-[320px] flex items-center justify-center shrink-0" style={{ marginTop: '-4px' }}>
           <div className="w-full max-w-[240px] sm:max-w-[260px]">
-            <div className="progress-bar-container">
+            <div className="progress-bar-container relative">
               <div className="progress-bar-fill" style={{ width: `${percent}%` }} />
-            </div>
-            <div className="text-center text-xs text-white mt-1 brawl-text">
-              {currentBook?.currentPage && currentBook?.totalPages
-                ? `${currentBook.currentPage} / ${currentBook.totalPages}`
-                : `${percent}%`}
+              <span className="absolute inset-0 flex items-center justify-center text-[10px] text-white brawl-text leading-none" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.5)' }}>
+                {currentBook?.currentPage && currentBook?.totalPages
+                  ? `${currentBook.currentPage} / ${currentBook.totalPages}`
+                  : `${percent}%`}
+              </span>
             </div>
           </div>
           {canEditProgress && (
             <button
               onClick={openProgressEdit}
-              className="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full border-2 border-gold flex items-center justify-center bg-navy"
+              className="absolute right-0 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full border-2 border-gold flex items-center justify-center bg-navy"
               aria-label="Edit progress"
               disabled={!hasCurrentBook}
               style={{
                 opacity: hasCurrentBook ? 1 : 0.5,
-                marginRight: '-18px',
-                marginTop: '-8px'
+                marginRight: '-8px',
               }}
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path
                   d="M3 17.25V21h3.75l11.06-11.06-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"
                   fill="#FFD93D"
@@ -222,8 +226,7 @@ export default function Home() {
 
         {/* Chest Frame */}
         <div
-          className="relative w-[calc(100%+64px)] -mx-8 mt-auto z-30"
-          style={{ marginTop: '-16px' }}
+          className="relative w-[calc(100%+32px)] -mx-4 shrink-0 z-30 mt-auto mb-2"
         >
           <Image
             src="/assets/chestframe.png"
@@ -245,7 +248,7 @@ export default function Home() {
                         alt=""
                         width={152}
                         height={128}
-                        className="w-[152px] h-auto"
+                        className="w-[100px] h-auto"
                         style={{ opacity: collected ? 0.5 : 1 }}
                       />
                       {collected && (
@@ -297,7 +300,7 @@ export default function Home() {
 
           {chestPage > 0 && (
             <button
-              className="absolute left-[-8px] top-1/2 -translate-y-1/2 w-10 h-10"
+              className="absolute left-[2px] top-1/2 -translate-y-1/2 w-10 h-10"
               aria-label="Previous chests"
               onClick={() => setChestPage((p) => p - 1)}
             >
@@ -307,7 +310,7 @@ export default function Home() {
 
           {chestPage < totalChestPages - 1 && (
             <button
-              className="absolute right-[-8px] top-1/2 -translate-y-1/2 w-10 h-10"
+              className="absolute right-[2px] top-1/2 -translate-y-1/2 w-10 h-10"
               aria-label="Next chests"
               onClick={() => setChestPage((p) => p + 1)}
             >

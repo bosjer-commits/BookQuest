@@ -61,8 +61,19 @@ export const SKIN_CATALOG: SkinDefinition[] = [
   { id: 'simon-elprimo',  character: 'ElPrimo',  owner: 'Simon',   asset: '/assets/Skins/Simon/Legendary/ElPrimo.png',  rarity: 'legendary' },
   { id: 'simon-spike',    character: 'Spike',    owner: 'Simon',   asset: '/assets/Skins/Simon/Legendary/Spike.png',    rarity: 'legendary' },
 
-  // Elliott
-  { id: 'elliott-spike',  character: 'Spike',    owner: 'Elliott', asset: '/assets/Skins/Elliott/Spike.png',            rarity: 'epic' },
+  // Elliott — Rare
+  { id: 'elliott-barley',   character: 'Barley',   owner: 'Elliott', asset: '/assets/Skins/Elliott/Rare/Barley.png',       rarity: 'rare' },
+  { id: 'elliott-edgar',    character: 'Edgar',    owner: 'Elliott', asset: '/assets/Skins/Elliott/Rare/Edgar.png',        rarity: 'rare' },
+  { id: 'elliott-elprimo',  character: 'ElPrimo',  owner: 'Elliott', asset: '/assets/Skins/Elliott/Rare/ElPrimo.png',      rarity: 'rare' },
+  { id: 'elliott-willow',   character: 'Willow',   owner: 'Elliott', asset: '/assets/Skins/Elliott/Rare/Willow.png',       rarity: 'rare' },
+  // Elliott — Epic
+  { id: 'elliott-8bit',     character: '8-Bit',    owner: 'Elliott', asset: '/assets/Skins/Elliott/Epic/8bit.png',         rarity: 'epic' },
+  { id: 'elliott-frank',    character: 'Frank',    owner: 'Elliott', asset: '/assets/Skins/Elliott/Epic/Frank.png',        rarity: 'epic' },
+  { id: 'elliott-tick',     character: 'Tick',     owner: 'Elliott', asset: '/assets/Skins/Elliott/Epic/Tick.png',         rarity: 'epic' },
+  // Elliott — Legendary
+  { id: 'elliott-nani',     character: 'Nani',     owner: 'Elliott', asset: '/assets/Skins/Elliott/Legendary/Nani.png',    rarity: 'legendary' },
+  { id: 'elliott-riko',     character: 'Riko',     owner: 'Elliott', asset: '/assets/Skins/Elliott/Legendary/Riko.png',    rarity: 'legendary' },
+  { id: 'elliott-spike',    character: 'Spike',    owner: 'Elliott', asset: '/assets/Skins/Elliott/Legendary/Spike.png',   rarity: 'legendary' },
 ];
 
 export type ChestTier = 'brawl' | 'big' | 'mega';

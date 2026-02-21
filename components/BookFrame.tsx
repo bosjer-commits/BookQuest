@@ -3,7 +3,7 @@ export default function BookFrame({ coverUrl, onSelect }: { coverUrl?: string; o
     <button
       type="button"
       onClick={onSelect}
-      className="relative w-[77px] h-[110px] cursor-pointer"
+      className="relative w-[70px] h-[100px] cursor-pointer"
     >
       <div className="absolute inset-[8%] z-[1]">
         {coverUrl ? (

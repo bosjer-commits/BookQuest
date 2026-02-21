@@ -28,9 +28,9 @@ export default function FriendRow({ friend, books, onSelectBook }: FriendRowProp
   const displayBooks = books.slice(0, 3);
 
   return (
-    <div className="flex items-center justify-center gap-3">
+    <div className="flex items-center justify-center gap-1 w-full">
       {/* Friend avatar with shimmer and glow */}
-      <div className="relative flex flex-col items-center flex-shrink-0" style={{ width: '128px' }}>
+      <div className="relative flex flex-col items-center flex-shrink-0" style={{ width: '110px' }}>
         {/* Shimmer pulse background */}
         <div
           className="absolute inset-0"
@@ -41,14 +41,14 @@ export default function FriendRow({ friend, books, onSelectBook }: FriendRowProp
           }}
         />
 
-        {/* Character with glow aura — fixed 128×128 box prevents layout shift between skins */}
+        {/* Character with glow aura */}
         <div
           style={{
             filter: 'drop-shadow(0 0 20px rgba(255,211,61,0.5)) drop-shadow(0 0 40px rgba(255,165,2,0.3))',
             position: 'relative',
             zIndex: 1,
-            width: '128px',
-            height: '128px',
+            width: '135px',
+            height: '135px',
             flexShrink: 0,
           }}
         >
@@ -58,9 +58,6 @@ export default function FriendRow({ friend, books, onSelectBook }: FriendRowProp
             fill
             style={{ objectFit: 'contain', objectPosition: 'bottom' }}
           />
-        </div>
-        <div className="text-[16px] text-[#7EC3FF] brawl-text mt-2" style={{ position: 'relative', zIndex: 1 }}>
-          {friend.name}
         </div>
 
         <style jsx>{`

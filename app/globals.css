@@ -43,6 +43,11 @@
   --progress-blue: #74B9FF;
   --progress-blue-dark: #0984E3;
 
+  /* Layout */
+  --nav-height: 72px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --nav-safe-bottom: calc(var(--nav-height) + var(--safe-bottom));
+
   /* Semantic Colors */
   --background: var(--bg-dark-purple);
   --foreground: var(--white);
@@ -133,7 +138,7 @@ body {
   background-attachment: fixed;
   color: var(--foreground);
   font-family: var(--font-sans);
-  min-height: 100vh;
+  min-height: 100dvh;
   margin: 0;
   padding: 0;
   overflow: hidden; /* Prevent body scroll, app-container handles it */
@@ -156,10 +161,12 @@ body {
 .app-container {
   position: fixed;
   inset: 0;
+  height: 100dvh;
 
   /* Mobile-first: Full screen with minimal padding */
   margin: 0;
   padding: 16px;
+  padding-top: calc(16px + env(safe-area-inset-top, 0px));
   padding-bottom: 0 !important;
 
   /* Prevent scroll for fixed-frame app layout */
@@ -174,14 +181,16 @@ body {
 /* Responsive frame sizing */
 @media (min-width: 640px) {
   .app-container {
-    margin: 16px auto 0 auto;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
     max-width: 428px; /* iPhone 15 Pro Max width */
+    width: 428px;
   }
 }
 
 @media (min-width: 1024px) {
   .app-container {
-    margin: 24px auto 0 auto;
     max-width: 428px;
   }
 }

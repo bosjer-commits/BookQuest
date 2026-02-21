@@ -34,7 +34,7 @@ function getDefaultSkinAsset(ownerName: string): string {
   const skin = SKIN_CATALOG.find(
     (s) => s.owner.toLowerCase() === ownerName.toLowerCase()
   );
-  return skin?.asset ?? '/assets/Skins/Elliott/Spike.png';
+  return skin?.asset ?? '/assets/Skins/Elliott/Legendary/Spike.png';
 }
 
 export default function FriendsPage() {
@@ -95,19 +95,11 @@ export default function FriendsPage() {
           .filter((b) => b.is_favorite && !b.reading_status)
           .sort((a, b) => (b.favorited_at ?? 0) - (a.favorited_at ?? 0));
 
-        // Build display books: highest-rated finished → in-progress → favorites, max 3
-        const seen = new Set<string>();
-        const books: BookItem[] = [];
-        for (const item of [...finishedBooks, ...inProgressBooks, ...favorites]) {
-          if (!seen.has(item.title)) {
-            seen.add(item.title);
-            books.push({
-              book: { title: item.title, author: item.author },
-              coverUrl: item.cover_url ?? undefined,
-            });
-            if (books.length === 3) break;
-          }
-        }
+        // Display only finished books, max 3
+        const books: BookItem[] = finishedBooks.slice(0, 3).map((item) => ({
+          book: { title: item.title, author: item.author },
+          coverUrl: item.cover_url ?? undefined,
+        }));
 
         // Resolve active skin for this friend
         const friendUnlockedIds = allSkins
@@ -194,12 +186,12 @@ export default function FriendsPage() {
   const ownData = kidsData.find((k) => k.id === viewingUserId);
 
   return (
-    <div className="min-h-full flex flex-col">
-      <main className="flex-1 px-4 pt-4 pb-0 space-y-6">
+    <div className="h-full flex flex-col overflow-hidden">
+      <main className="flex-1 px-4 pt-0 pb-0 flex flex-col gap-1 overflow-hidden min-h-0" style={{ marginTop: '-12px', paddingBottom: 'var(--nav-height)' }}>
         {/* Own character showcase */}
         <div className="relative">
           <CharacterShowcase
-            skins={ownSkinAssets.length > 0 ? ownSkinAssets : ['/assets/Skins/Elliott/Spike.png']}
+            skins={ownSkinAssets.length > 0 ? ownSkinAssets : ['/assets/Skins/Elliott/Legendary/Spike.png']}
             name={viewingProfile?.name ?? ''}
             activeIndex={ownSkinIndex}
             onIndexChange={handleOwnSkinChange}

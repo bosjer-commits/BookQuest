@@ -13,12 +13,13 @@ export default function BottomNav({ active = 'home' }: BottomNavProps) {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 px-0 pb-0 pt-1 z-20"
+      className="fixed bottom-0 left-0 right-0 px-0 pt-1 z-20 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:w-[428px]"
       style={{
         backgroundImage: 'url(/assets/bluebar.svg)',
         backgroundSize: '100% 100%',
         backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
+        backgroundRepeat: 'no-repeat',
+        paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 8px)',
       }}
     >
       <div className="flex items-center justify-evenly w-full px-2 sm:px-4">

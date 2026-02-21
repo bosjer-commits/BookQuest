@@ -22,34 +22,19 @@ export default function BookDisplay({
   onInfoClick,
 }: BookDisplayProps) {
   return (
-    <div className="relative flex items-center justify-center gap-0" style={{ paddingLeft: '5px', paddingRight: '5px' }}>
-      {/* Left Arrow */}
-      <button
-        onClick={onPrevBook}
-        className="w-14 h-14 flex-shrink-0 transition-transform hover:scale-110 active:scale-95 z-10"
-        style={{ marginRight: '-20px' }}
-        aria-label="Previous book"
-      >
-        <Image
-          src="/assets/blueleft.png"
-          alt=""
-          width={56}
-          height={56}
-          className="w-14 h-14 object-contain"
-        />
-      </button>
-
-      {/* Book with Frame */}
-      <div className="relative">
-        {/* Container for book and frame */}
+    <div className="flex-1 min-h-0 flex items-center justify-center">
+      {/* Book with Frame — arrows and info positioned relative to this */}
+      <div className="relative h-full flex items-center justify-center">
         <div
           className="relative"
           style={{
-            width: '310px',
-            height: '460px',
+            aspectRatio: '310 / 460',
+            maxWidth: '310px',
+            maxHeight: '460px',
+            height: '100%',
           }}
         >
-          {/* Book Cover - positioned behind the frame */}
+          {/* Book Cover */}
           <div className="absolute" style={{ top: '8%', right: '8%', bottom: '6%', left: '8%', zIndex: 1 }}>
             {loading ? (
               <div className="text-white text-xs">Loading...</div>
@@ -69,7 +54,7 @@ export default function BookDisplay({
             )}
           </div>
 
-          {/* Frame overlay - positioned on top of book cover */}
+          {/* Frame overlay */}
           <img
             src="/assets/bookframe.png"
             alt=""
@@ -117,34 +102,50 @@ export default function BookDisplay({
               *
             </span>
           </div>
+
+          {/* Left Arrow — positioned relative to book frame */}
+          <button
+            onClick={onPrevBook}
+            className="absolute top-1/2 -translate-y-1/2 w-12 h-12 transition-transform hover:scale-110 active:scale-95 z-10"
+            style={{ left: '-40px' }}
+            aria-label="Previous book"
+          >
+            <Image
+              src="/assets/blueleft.png"
+              alt=""
+              width={48}
+              height={48}
+              className="w-12 h-12 object-contain"
+            />
+          </button>
+
+          {/* Right Arrow — positioned relative to book frame */}
+          <button
+            onClick={onNextBook}
+            className="absolute top-1/2 -translate-y-1/2 w-12 h-12 transition-transform hover:scale-110 active:scale-95 z-10"
+            style={{ right: '-40px' }}
+            aria-label="Next book"
+          >
+            <Image
+              src="/assets/blueright.png"
+              alt=""
+              width={48}
+              height={48}
+              className="w-12 h-12 object-contain scale-[0.98]"
+            />
+          </button>
+
+          {/* Info Button — positioned relative to book frame */}
+          <button
+            onClick={onInfoClick}
+            className="absolute w-10 h-10 transition-transform hover:scale-110 active:scale-95 z-10"
+            aria-label="Book information"
+            style={{ right: '-4px', top: '8px' }}
+          >
+            <Image src="/assets/info.png" alt="" width={40} height={40} />
+          </button>
         </div>
-
-        {/* Info Button - positioned at top-right corner */}
-        <button
-          onClick={onInfoClick}
-          className="absolute w-10 h-10 transition-transform hover:scale-110 active:scale-95 z-10"
-          aria-label="Book information"
-          style={{ right: '8px', top: '8px' }}
-        >
-          <Image src="/assets/info.png" alt="" width={40} height={40} />
-        </button>
       </div>
-
-      {/* Right Arrow */}
-      <button
-        onClick={onNextBook}
-        className="w-14 h-14 flex-shrink-0 transition-transform hover:scale-110 active:scale-95 z-10"
-        style={{ marginLeft: '-25px' }}
-        aria-label="Next book"
-      >
-        <Image
-          src="/assets/blueright.png"
-          alt=""
-          width={56}
-          height={56}
-          className="w-14 h-14 object-contain scale-[0.98]"
-        />
-      </button>
     </div>
   );
 }
