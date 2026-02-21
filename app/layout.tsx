@@ -24,6 +24,18 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "Book Quest",
   description: "Your literary adventure companion",
+  icons: {
+    icon: [
+      { url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: { url: "/apple-touch-icon.png", sizes: "180x180" },
+  },
+  manifest: "/site.webmanifest",
+  appleWebApp: {
+    title: "Book Quest",
+  },
 };
 
 export default function RootLayout({
