@@ -9,7 +9,7 @@ export interface UserProfile {
 }
 
 export const USERS: UserProfile[] = [
-  { id: 'elliott', name: 'Elliott', role: 'kid',    pin: '6081' },
+  { id: 'elliott', name: 'Elliot', role: 'kid',    pin: '6081' },
   { id: 'robin',   name: 'Robin',   role: 'kid',    pin: '0824' },
   { id: 'simon',   name: 'Simon',   role: 'kid',    pin: '0115' },
   { id: 'oliver',  name: 'Oliver',  role: 'kid',    pin: '3294' },

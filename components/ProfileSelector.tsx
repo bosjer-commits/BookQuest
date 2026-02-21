@@ -7,7 +7,7 @@ import PinModal from '@/components/PinModal';
 
 // Hotspot positions as percentages of the image (top, left, width, height)
 const HOTSPOTS: { id: string; top: number; left: number; width: number; height: number }[] = [
-  // Row 1: Elliott, Robin, Simon
+  // Row 1: Elliot, Robin, Simon
   { id: 'elliott', top: 22, left: 4,  width: 30, height: 16 },
   { id: 'robin',   top: 22, left: 35, width: 30, height: 16 },
   { id: 'simon',   top: 22, left: 66, width: 30, height: 16 },
