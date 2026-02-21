@@ -150,36 +150,27 @@ function WelcomeFlow({ userId, children }: { userId: string; children: ReactNode
       className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden"
       style={{ background: '#162544' }}
     >
-      <div className="relative w-full h-full max-w-[500px] mx-auto">
+      <button
+        type="button"
+        onClick={() => setStep('chest')}
+        className="relative w-full h-full max-w-[500px] mx-auto"
+        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+        aria-label="Open your first chest"
+      >
         {/* Background image */}
         <img
           src="/assets/openfirstchest.webp"
           alt="Welcome to Book Quest"
           className="w-full h-full object-contain"
         />
-        {/* Chest in the center — tappable */}
-        <button
-          type="button"
-          onClick={() => setStep('chest')}
+        {/* Chest in the center */}
+        <img
+          src={CHEST_TIERS.brawl.swirlAnimation}
+          alt="Chest"
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
           style={{ width: '55%' }}
-          aria-label="Open your first chest"
-        >
-          <img
-            src={CHEST_TIERS.brawl.swirlAnimation}
-            alt="Chest"
-            className="w-full h-auto"
-          />
-        </button>
-        {/* "Open your first chest!" banner hotspot */}
-        <button
-          type="button"
-          onClick={() => setStep('chest')}
-          className="absolute left-1/2 -translate-x-1/2"
-          style={{ bottom: '12%', width: '80%', height: '7%', background: 'transparent', border: 'none', cursor: 'pointer' }}
-          aria-label="Open your first chest"
         />
-      </div>
+      </button>
     </div>
   );
 }
