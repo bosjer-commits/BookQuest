@@ -46,7 +46,7 @@ export default function ProfileSelector() {
     >
       <div className="relative w-full h-full max-w-[500px] mx-auto">
         <img
-          src="/assets/landingpage.png"
+          src="/assets/Landingpage.png"
           alt="Book Quest - Who's reading today?"
           className="w-full h-full object-contain"
         />
