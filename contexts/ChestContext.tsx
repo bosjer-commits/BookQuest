@@ -12,7 +12,7 @@ interface ChestContextType {
   isSkinUnlocked: (skinId: string) => boolean;
 }
 
-const ChestContext = createContext<ChestContextType | undefined>(undefined);
+export const ChestContext = createContext<ChestContextType | undefined>(undefined);
 
 export function ChestProvider({ children, userId }: { children: ReactNode; userId: string }) {
   const [unlockedSkins, setUnlockedSkins] = useState<string[]>([]);

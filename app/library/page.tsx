@@ -21,7 +21,7 @@ function LibraryContent() {
   const didInitFromQuery = useRef(false);
   const { setCurrentBook } = useCurrentBook();
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
-  const { canEditProgress } = useUser();
+  const { canEditProgress, basePath } = useUser();
   const [categoryIndex, setCategoryIndex] = useState(0);
   const [bookIndex, setBookIndex] = useState(0);
   const [coverUrl, setCoverUrl] = useState<string | null>(null);
@@ -36,7 +36,7 @@ function LibraryContent() {
 
   const handleStartReading = () => {
     setCurrentBook(currentBook, coverUrl || undefined);
-    router.push('/');
+    router.push(basePath || '/');
   };
 
   const toggleFavorite = () => {

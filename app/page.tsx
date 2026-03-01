@@ -13,7 +13,7 @@ export default function Home() {
   const router = useRouter();
   const { currentBook, finishedBooks, updateReadingProgress, updateRating, finishCurrentBook } = useCurrentBook();
   const { isChestCollected } = useChest();
-  const { canEditProgress, viewingProfile, isParentMode, activeProfile, logout, clearKidSelection } = useUser();
+  const { canEditProgress, viewingProfile, isParentMode, activeProfile, logout, clearKidSelection, basePath } = useUser();
   const [showProgressEdit, setShowProgressEdit] = useState(false);
   const [openingChestGoal, setOpeningChestGoal] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState('');
@@ -137,7 +137,7 @@ export default function Home() {
             <div className="relative mx-auto" style={{ aspectRatio: '280 / 400', maxWidth: '280px', maxHeight: '400px', height: '100%' }}>
             {hasCurrentBook ? (
               <button
-                onClick={() => router.push('/library')}
+                onClick={() => router.push(`${basePath}/library`)}
                 className="absolute cursor-pointer"
                 style={{ top: '8%', right: '8%', bottom: '6%', left: '8%', zIndex: 1, padding: 0, background: 'none', border: 'none' }}
                 aria-label="Go to library"
@@ -157,7 +157,7 @@ export default function Home() {
               </button>
             ) : (
               <button
-                onClick={() => router.push('/library')}
+                onClick={() => router.push(`${basePath}/library`)}
                 className="absolute inset-[10%] z-[1] flex items-center justify-center rounded bg-white/10 border-2 border-white/40"
                 aria-label="Add a book"
               >
@@ -367,6 +367,7 @@ export default function Home() {
                         min="0"
                         value={currentPage}
                         onChange={(e) => setCurrentPage(e.target.value)}
+                        onFocus={(e) => e.target.select()}
                         className="progress-input absolute inset-0 w-full bg-transparent text-center text-[18px] text-[#F6D58A] outline-none"
                         placeholder="0"
                         autoFocus
@@ -393,6 +394,7 @@ export default function Home() {
                         min="1"
                         value={totalPages}
                         onChange={(e) => setTotalPages(e.target.value)}
+                        onFocus={(e) => e.target.select()}
                         className="progress-input absolute inset-0 w-full bg-transparent text-center text-[18px] text-[#F6D58A] outline-none"
                         placeholder="0"
                       />

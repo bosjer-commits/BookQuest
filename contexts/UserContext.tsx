@@ -11,13 +11,14 @@ interface UserContextType {
   viewingUserId: string | null;
   isParentMode: boolean;
   canEditProgress: boolean;
+  basePath: string;
   login: (userId: string) => void;
   logout: () => void;
   selectKid: (kidId: string) => void;
   clearKidSelection: () => void;
 }
 
-const UserContext = createContext<UserContextType | undefined>(undefined);
+export const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserProvider({ children }: { children: ReactNode }) {
   const [activeUserId, setActiveUserId] = useState<string | null>(null);
@@ -98,6 +99,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         viewingUserId,
         isParentMode,
         canEditProgress,
+        basePath: '',
         login,
         logout,
         selectKid,

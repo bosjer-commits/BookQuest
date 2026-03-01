@@ -26,7 +26,7 @@ interface FavoritesContextType {
   isFavorite: (bookTitle: string) => boolean;
 }
 
-const FavoritesContext = createContext<FavoritesContextType | undefined>(undefined);
+export const FavoritesContext = createContext<FavoritesContextType | undefined>(undefined);
 
 export function FavoritesProvider({ children, userId }: { children: ReactNode; userId: string }) {
   const [favorites, setFavorites] = useState<FavoriteBook[]>([]);

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { useUser } from '@/contexts/UserContext';
 
 type NavItem = 'library' | 'favorites' | 'friends' | 'home';
 
@@ -10,6 +11,7 @@ interface BottomNavProps {
 }
 
 export default function BottomNav({ active = 'home' }: BottomNavProps) {
+  const { basePath } = useUser();
 
   return (
     <nav
@@ -25,7 +27,7 @@ export default function BottomNav({ active = 'home' }: BottomNavProps) {
       <div className="flex items-center justify-evenly w-full px-2 sm:px-4">
         {/* Home */}
         <Link
-          href="/"
+          href={basePath || '/'}
           className={`flex items-center justify-center flex-1 transition-all ${
             active === 'home' ? 'nav-icon active' : 'nav-icon'
           }`}
@@ -43,7 +45,7 @@ export default function BottomNav({ active = 'home' }: BottomNavProps) {
 
         {/* Library/Book */}
         <Link
-          href="/library"
+          href={`${basePath}/library`}
           className={`flex items-center justify-center flex-1 transition-all ${
             active === 'library' ? 'nav-icon active' : 'nav-icon'
           }`}
@@ -61,7 +63,7 @@ export default function BottomNav({ active = 'home' }: BottomNavProps) {
 
         {/* Favorites/Heart */}
         <Link
-          href="/favorites"
+          href={`${basePath}/favorites`}
           className={`flex items-center justify-center flex-1 transition-all ${
             active === 'favorites' ? 'nav-icon active' : 'nav-icon'
           }`}
@@ -79,7 +81,7 @@ export default function BottomNav({ active = 'home' }: BottomNavProps) {
 
         {/* Friends */}
         <Link
-          href="/friends"
+          href={`${basePath}/friends`}
           className={`flex items-center justify-center flex-1 transition-all ${
             active === 'friends' ? 'nav-icon active' : 'nav-icon'
           }`}

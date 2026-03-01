@@ -57,7 +57,7 @@ function rowToBookData(row: any): CurrentBookData {
   };
 }
 
-const CurrentBookContext = createContext<CurrentBookContextType | undefined>(undefined);
+export const CurrentBookContext = createContext<CurrentBookContextType | undefined>(undefined);
 
 export function CurrentBookProvider({ children, userId }: { children: ReactNode; userId: string }) {
   const [currentBook, setCurrentBookState] = useState<CurrentBookData | null>(null);
