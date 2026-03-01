@@ -2,6 +2,7 @@
 
 import { ReactNode, useState, useEffect } from 'react';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { useUser } from '@/contexts/UserContext';
 import { USERS } from '@/data/users';
 import { CHEST_TIERS } from '@/data/skins';
@@ -177,6 +178,9 @@ function WelcomeFlow({ userId, children }: { userId: string; children: ReactNode
 
 export default function UserDataProviders({ children }: { children: ReactNode }) {
   const { activeUserId, viewingUserId, isParentMode } = useUser();
+  const pathname = usePathname();
+
+  if (pathname.startsWith('/test')) return <>{children}</>;
 
   if (!activeUserId) return <ProfileSelector />;
   if (!viewingUserId) return <KidPicker />;
