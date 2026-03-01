@@ -3,6 +3,8 @@ import { augustprisetWinners } from './augustpriset';
 import { bramStokerWinners } from './bramStoker';
 import { groteVriendelijke100 } from './groteVriendelijke';
 import { lasarnasLegender } from './LasarnasLegender';
+import { carnegieMedalWinners } from './carnegieMedal';
+import { newberyMedalWinners } from './newberyMedal';
 
 export interface PrizeCategory {
   id: string;
@@ -50,5 +52,17 @@ export const prizeCategories: PrizeCategory[] = [
     name: 'Läsarnas Legender',
     domeImage: '/assets/lasarnasdome.png',
     books: lasarnasLegender,
+  },
+  {
+    id: 'carnegie-medal',
+    name: 'Carnegie Medal',
+    domeImage: '/assets/carnegiedome.png',
+    books: [...carnegieMedalWinners].reverse(),
+  },
+  {
+    id: 'newbery-medal',
+    name: 'Newbery Medal',
+    domeImage: '/assets/newberydome.png',
+    books: [...newberyMedalWinners].reverse(),
   },
 ];
