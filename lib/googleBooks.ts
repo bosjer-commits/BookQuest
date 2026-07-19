@@ -117,8 +117,52 @@ export class BookSearchRateLimitError extends Error {
   }
 }
 
+function parseVolumes(data: { items?: unknown[] }): BookSearchItem[] {
+  const items = Array.isArray(data.items) ? data.items : [];
+  const seen = new Set<string>();
+  const results: BookSearchItem[] = [];
+
+  for (const raw of items) {
+    const info = (raw as { volumeInfo?: Record<string, unknown> }).volumeInfo ?? {};
+    const title = info.title as string | undefined;
+    if (!title) continue;
+
+    const author = ((info.authors as string[] | undefined) ?? []).join(', ') || 'Unknown';
+    const key = `${title.toLowerCase()}|${author.toLowerCase()}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+
+    const imageLinks = info.imageLinks as { thumbnail?: string; smallThumbnail?: string } | undefined;
+    let cover: string | null = imageLinks?.thumbnail || imageLinks?.smallThumbnail || null;
+    if (cover) {
+      cover = cover.replace('http://', 'https://').replace('&edge=curl', '');
+    }
+
+    const published = info.publishedDate as string | undefined;
+    const year = published ? parseInt(String(published).slice(0, 4), 10) || 0 : 0;
+
+    results.push({
+      title,
+      author,
+      coverUrl: cover,
+      description: info.description as string | undefined,
+      year,
+      totalPages: (info.pageCount as number | undefined) ?? 0,
+    });
+  }
+
+  return results;
+}
+
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 // Free-text search returning a de-duplicated list of results (for the "add any book" flow).
-// Throws BookSearchRateLimitError on 429 so the UI can show an honest message.
+//
+// The Google Books API is unreliable: it intermittently returns 0 results (and
+// the odd 5xx) for queries that genuinely have matches. We retry a few times so
+// a real book isn't reported as "not found" just because one request flaked out.
+//
+// Throws BookSearchRateLimitError on persistent 429s so the UI can be honest.
 export async function searchBooks(query: string, maxResults = 12): Promise<BookSearchItem[]> {
   const q = query.trim();
   if (!q) return [];
@@ -126,56 +170,53 @@ export async function searchBooks(query: string, maxResults = 12): Promise<BookS
   const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(
     q
   )}&maxResults=${maxResults}&printType=books${keyParam}`;
-  const response = await fetch(url);
-  if (response.status === 429) {
-    throw new BookSearchRateLimitError();
-  }
-  if (!response.ok) {
-    console.error('Google Books search error:', response.status);
-    throw new Error(`Google Books search failed: ${response.status}`);
-  }
 
-  try {
-    const data = await response.json();
-    if (!data.items) return [];
+  const maxAttempts = 5;
+  let sawOkEmpty = false; // a clean 200 that returned nothing (likely genuine no-match)
+  let sawRateLimit = false;
 
-    const seen = new Set<string>();
-    const results: BookSearchItem[] = [];
-
-    for (const item of data.items) {
-      const info = item.volumeInfo ?? {};
-      if (!info.title) continue;
-
-      const author = (info.authors ?? []).join(', ') || 'Unknown';
-      const key = `${info.title.toLowerCase()}|${author.toLowerCase()}`;
-      if (seen.has(key)) continue;
-      seen.add(key);
-
-      let cover: string | null =
-        info.imageLinks?.thumbnail || info.imageLinks?.smallThumbnail || null;
-      if (cover) {
-        cover = cover.replace('http://', 'https://').replace('&edge=curl', '');
-      }
-
-      const year = info.publishedDate
-        ? parseInt(String(info.publishedDate).slice(0, 4), 10) || 0
-        : 0;
-
-      results.push({
-        title: info.title,
-        author,
-        coverUrl: cover,
-        description: info.description,
-        year,
-        totalPages: info.pageCount ?? 0,
-      });
+  for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+    let response: Response;
+    try {
+      response = await fetch(url);
+    } catch (error) {
+      console.warn('Google Books search fetch failed, retrying:', error);
+      await delay(250);
+      continue;
     }
 
-    return results;
-  } catch (error) {
-    console.error('Google Books search failed:', error);
-    return [];
+    if (response.status === 429) {
+      sawRateLimit = true;
+      await delay(300);
+      continue;
+    }
+    if (!response.ok) {
+      console.warn('Google Books search HTTP', response.status, '- retrying');
+      await delay(300);
+      continue;
+    }
+
+    let results: BookSearchItem[] = [];
+    try {
+      results = parseVolumes(await response.json());
+    } catch (error) {
+      console.warn('Google Books parse failed, retrying:', error);
+      await delay(250);
+      continue;
+    }
+
+    if (results.length > 0) return results;
+
+    // 200 but empty — usually the flaky API; retry a couple more times before trusting it.
+    sawOkEmpty = true;
+    await delay(250);
   }
+
+  // Exhausted retries. If we ever got a clean-but-empty response, treat it as a
+  // real "no matches"; otherwise the endpoint was failing outright.
+  if (sawOkEmpty) return [];
+  if (sawRateLimit) throw new BookSearchRateLimitError();
+  throw new Error('Google Books search failed after retries');
 }
 
 export function getBookCoverUrl(result: GoogleBookResult | null): string | null {

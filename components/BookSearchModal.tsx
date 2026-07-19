@@ -30,6 +30,7 @@ export default function BookSearchModal({ onClose, onPick }: BookSearchModalProp
   const [mAuthor, setMAuthor] = useState('');
   const [mPages, setMPages] = useState('');
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const reqSeqRef = useRef(0);
 
   // Debounced search as the user types
   useEffect(() => {
@@ -44,12 +45,15 @@ export default function BookSearchModal({ onClose, onPick }: BookSearchModalProp
     }
     setLoading(true);
     setErrorMsg(null);
+    const seq = ++reqSeqRef.current;
     debounceRef.current = setTimeout(async () => {
       try {
         const items = await searchBooks(q);
+        if (seq !== reqSeqRef.current) return; // a newer search superseded this one
         setResults(items);
         setErrorMsg(null);
       } catch (e) {
+        if (seq !== reqSeqRef.current) return;
         setResults([]);
         setErrorMsg(
           e instanceof BookSearchRateLimitError
@@ -57,8 +61,10 @@ export default function BookSearchModal({ onClose, onPick }: BookSearchModalProp
             : 'Search is unavailable right now. You can still add a book manually below.'
         );
       } finally {
-        setSearched(true);
-        setLoading(false);
+        if (seq === reqSeqRef.current) {
+          setSearched(true);
+          setLoading(false);
+        }
       }
     }, 400);
     return () => {
