@@ -73,7 +73,7 @@ export const SKIN_CATALOG: SkinDefinition[] = [
   // Elliot — Legendary
   { id: 'elliott-nani',     character: 'Nani',     owner: 'Elliot', asset: '/assets/Skins/Elliot/Legendary/Nani.png',    rarity: 'legendary' },
   { id: 'elliott-riko',     character: 'Riko',     owner: 'Elliot', asset: '/assets/Skins/Elliot/Legendary/Riko.png',    rarity: 'legendary' },
-  { id: 'elliott-spike',    character: 'Spike',    owner: 'Elliot', asset: '/assets/Skins/Elliot/Legendary/Spike.png',   rarity: 'legendary' },
+  { id: 'elliott-spike',    character: 'Spike',    owner: 'Elliot', asset: '/assets/Skins/Elliot/Legendary/ElliotSpike.png',   rarity: 'legendary' },
 
   // Annalyn — Rare
   { id: 'annalyn-blue',    character: 'Blue',    owner: 'Annalyn', asset: '/assets/Skins/Annalyn/blue.png',   rarity: 'rare' },

@@ -30,7 +30,7 @@ function getDefaultSkinAsset(ownerName: string): string {
   const skin = SKIN_CATALOG.find(
     (s) => s.owner.toLowerCase() === ownerName.toLowerCase()
   );
-  return skin?.asset ?? '/assets/Skins/Elliot/Legendary/Spike.png';
+  return skin?.asset ?? '/assets/Skins/Elliot/Legendary/ElliotSpike.png';
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
