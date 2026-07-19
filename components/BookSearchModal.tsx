@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { searchBooks, type BookSearchItem } from '@/lib/googleBooks';
+import { searchBooks, BookSearchRateLimitError, type BookSearchItem } from '@/lib/googleBooks';
 
 export interface PickedBook {
   title: string;
@@ -24,6 +24,7 @@ export default function BookSearchModal({ onClose, onPick }: BookSearchModalProp
   const [results, setResults] = useState<BookSearchItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [manual, setManual] = useState(false);
   const [mTitle, setMTitle] = useState('');
   const [mAuthor, setMAuthor] = useState('');
@@ -38,14 +39,27 @@ export default function BookSearchModal({ onClose, onPick }: BookSearchModalProp
       setResults([]);
       setSearched(false);
       setLoading(false);
+      setErrorMsg(null);
       return;
     }
     setLoading(true);
+    setErrorMsg(null);
     debounceRef.current = setTimeout(async () => {
-      const items = await searchBooks(q);
-      setResults(items);
-      setSearched(true);
-      setLoading(false);
+      try {
+        const items = await searchBooks(q);
+        setResults(items);
+        setErrorMsg(null);
+      } catch (e) {
+        setResults([]);
+        setErrorMsg(
+          e instanceof BookSearchRateLimitError
+            ? 'Book search is over its daily limit right now. You can still add a book manually below.'
+            : 'Search is unavailable right now. You can still add a book manually below.'
+        );
+      } finally {
+        setSearched(true);
+        setLoading(false);
+      }
     }, 400);
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -187,7 +201,13 @@ export default function BookSearchModal({ onClose, onPick }: BookSearchModalProp
               </p>
             )}
 
-            {!loading && searched && results.length === 0 && (
+            {!loading && errorMsg && (
+              <p className="text-center text-sm brawl-text pt-6 px-4" style={{ color: '#FFB4A0' }}>
+                {errorMsg}
+              </p>
+            )}
+
+            {!loading && !errorMsg && searched && results.length === 0 && (
               <p className="text-center text-sm brawl-text pt-6" style={{ color: 'rgba(116,185,255,0.6)' }}>
                 No matches found.
               </p>

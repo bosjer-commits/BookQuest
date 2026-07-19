@@ -21,6 +21,11 @@ interface OpenLibrarySearchResult {
   }>;
 }
 
+// Optional API key raises the very low anonymous Google Books quota.
+// Restrict the key by HTTP referrer in Google Cloud so it can't be abused.
+const GOOGLE_BOOKS_KEY = process.env.NEXT_PUBLIC_GOOGLE_BOOKS_API_KEY;
+const keyParam = GOOGLE_BOOKS_KEY ? `&key=${GOOGLE_BOOKS_KEY}` : '';
+
 export async function searchBook(title: string, author: string): Promise<GoogleBookResult | null> {
   try {
     // Try multiple search strategies in order of specificity
@@ -36,7 +41,7 @@ export async function searchBook(title: string, author: string): Promise<GoogleB
     ];
 
     for (const query of searchStrategies) {
-      const url = `https://www.googleapis.com/books/v1/volumes?q=${query}&maxResults=5`;
+      const url = `https://www.googleapis.com/books/v1/volumes?q=${query}&maxResults=5${keyParam}`;
 
       const response = await fetch(url);
 
@@ -104,21 +109,33 @@ export interface BookSearchItem {
   totalPages: number;
 }
 
+// Raised by callers to distinguish "quota exceeded" from "no results".
+export class BookSearchRateLimitError extends Error {
+  constructor() {
+    super('Google Books rate limit exceeded');
+    this.name = 'BookSearchRateLimitError';
+  }
+}
+
 // Free-text search returning a de-duplicated list of results (for the "add any book" flow).
+// Throws BookSearchRateLimitError on 429 so the UI can show an honest message.
 export async function searchBooks(query: string, maxResults = 12): Promise<BookSearchItem[]> {
   const q = query.trim();
   if (!q) return [];
 
-  try {
-    const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(
-      q
-    )}&maxResults=${maxResults}&printType=books`;
-    const response = await fetch(url);
-    if (!response.ok) {
-      console.error('Google Books search error:', response.status);
-      return [];
-    }
+  const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(
+    q
+  )}&maxResults=${maxResults}&printType=books${keyParam}`;
+  const response = await fetch(url);
+  if (response.status === 429) {
+    throw new BookSearchRateLimitError();
+  }
+  if (!response.ok) {
+    console.error('Google Books search error:', response.status);
+    throw new Error(`Google Books search failed: ${response.status}`);
+  }
 
+  try {
     const data = await response.json();
     if (!data.items) return [];
 
