@@ -16,6 +16,8 @@
 # next.js
 /.next/
 /out/
+# stray nested build traces (e.g. accidentally created under public/)
+**/.next/
 
 # production
 /build
