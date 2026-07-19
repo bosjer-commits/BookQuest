@@ -27,24 +27,20 @@ export function DemoUserProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const activeProfile = activeUserId ? (USERS.find((u) => u.id === activeUserId) ?? null) : null;
-  const viewingProfile = activeProfile?.role === 'kid' ? activeProfile : null;
+  const viewingProfile = activeProfile;
   const viewingUserId = viewingProfile?.id ?? null;
 
   return (
     <UserContext.Provider
       value={{
         activeUserId,
-        selectedKidId: null,
         activeProfile,
         viewingProfile,
         viewingUserId,
-        isParentMode: false,
         canEditProgress: true,
         basePath: '/test',
         login,
         logout,
-        selectKid: () => {},
-        clearKidSelection: () => {},
       }}
     >
       {hydrated ? children : null}

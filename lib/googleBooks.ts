@@ -95,6 +95,72 @@ export async function searchBook(title: string, author: string): Promise<GoogleB
   }
 }
 
+export interface BookSearchItem {
+  title: string;
+  author: string;
+  coverUrl: string | null;
+  description?: string;
+  year: number;
+  totalPages: number;
+}
+
+// Free-text search returning a de-duplicated list of results (for the "add any book" flow).
+export async function searchBooks(query: string, maxResults = 12): Promise<BookSearchItem[]> {
+  const q = query.trim();
+  if (!q) return [];
+
+  try {
+    const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(
+      q
+    )}&maxResults=${maxResults}&printType=books`;
+    const response = await fetch(url);
+    if (!response.ok) {
+      console.error('Google Books search error:', response.status);
+      return [];
+    }
+
+    const data = await response.json();
+    if (!data.items) return [];
+
+    const seen = new Set<string>();
+    const results: BookSearchItem[] = [];
+
+    for (const item of data.items) {
+      const info = item.volumeInfo ?? {};
+      if (!info.title) continue;
+
+      const author = (info.authors ?? []).join(', ') || 'Unknown';
+      const key = `${info.title.toLowerCase()}|${author.toLowerCase()}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+
+      let cover: string | null =
+        info.imageLinks?.thumbnail || info.imageLinks?.smallThumbnail || null;
+      if (cover) {
+        cover = cover.replace('http://', 'https://').replace('&edge=curl', '');
+      }
+
+      const year = info.publishedDate
+        ? parseInt(String(info.publishedDate).slice(0, 4), 10) || 0
+        : 0;
+
+      results.push({
+        title: info.title,
+        author,
+        coverUrl: cover,
+        description: info.description,
+        year,
+        totalPages: info.pageCount ?? 0,
+      });
+    }
+
+    return results;
+  } catch (error) {
+    console.error('Google Books search failed:', error);
+    return [];
+  }
+}
+
 export function getBookCoverUrl(result: GoogleBookResult | null): string | null {
   if (!result?.imageLinks) return null;
 

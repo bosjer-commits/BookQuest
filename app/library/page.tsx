@@ -8,6 +8,7 @@ import BottomNav from '@/components/BottomNav';
 import CategorySelector from '@/components/CategorySelector';
 import BookDisplay from '@/components/BookDisplay';
 import BookInfoSection from '@/components/BookInfoSection';
+import BookSearchModal, { type PickedBook } from '@/components/BookSearchModal';
 import { prizeCategories } from '@/data/categories';
 import { searchBook, getBookCoverUrl, fetchOpenLibraryCover } from '@/lib/googleBooks';
 import { getCoverOverrideByIsbn, getCoverOverrideByTitleAuthor } from '@/data/coverOverrides';
@@ -28,6 +29,7 @@ function LibraryContent() {
   const [description, setDescription] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
   const coverCacheKey = 'bookquest_cover_cache_v1';
   const coverCacheTtlMs = 90 * 24 * 60 * 60 * 1000;
 
@@ -36,6 +38,16 @@ function LibraryContent() {
 
   const handleStartReading = () => {
     setCurrentBook(currentBook, coverUrl || undefined);
+    router.push(basePath || '/');
+  };
+
+  const handlePickSearchResult = (book: PickedBook) => {
+    setCurrentBook(
+      { year: book.year, title: book.title, author: book.author },
+      book.coverUrl,
+      book.totalPages
+    );
+    setShowSearch(false);
     router.push(basePath || '/');
   };
 
@@ -191,6 +203,26 @@ function LibraryContent() {
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
+      {/* Floating search button — add any book */}
+      <button
+        type="button"
+        onClick={() => setShowSearch(true)}
+        className="fixed top-3 right-3 z-40 rounded-full flex items-center justify-center"
+        style={{
+          width: '40px',
+          height: '40px',
+          background: 'rgba(22,37,68,0.85)',
+          border: '2px solid rgba(116,185,255,0.6)',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.4)',
+        }}
+        aria-label="Search for a book to add"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="11" cy="11" r="7" stroke="#74B9FF" strokeWidth="2" />
+          <path d="M20 20l-3.5-3.5" stroke="#74B9FF" strokeWidth="2" strokeLinecap="round" />
+        </svg>
+      </button>
+
       <main
         className="flex-1 flex flex-col items-center px-4 pb-0 gap-1 overflow-hidden min-h-0"
         style={{ marginTop: '-16px', paddingBottom: 'var(--nav-height)' }}
@@ -224,6 +256,14 @@ function LibraryContent() {
       </main>
 
       <BottomNav active="library" />
+
+      {/* Book search / add-any-book overlay */}
+      {showSearch && canEditProgress && (
+        <BookSearchModal
+          onClose={() => setShowSearch(false)}
+          onPick={handlePickSearchResult}
+        />
+      )}
 
       {/* Info Overlay */}
       {showInfo && (

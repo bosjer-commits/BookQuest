@@ -26,7 +26,7 @@ interface CurrentBookContextType {
   currentBook: CurrentBookData | null;
   inProgressBooks: CurrentBookData[];
   finishedBooks: CurrentBookData[];
-  setCurrentBook: (book: Book, coverUrl?: string) => void;
+  setCurrentBook: (book: Book, coverUrl?: string, totalPages?: number) => void;
   updateProgress: (progress: number) => void;
   updateReadingProgress: (currentPage: number, totalPages: number) => void;
   updateRating: (rating: number) => void;
@@ -91,7 +91,8 @@ export function CurrentBookProvider({ children, userId }: { children: ReactNode;
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
-  const setCurrentBook = (book: Book, coverUrl?: string) => {
+  const setCurrentBook = (book: Book, coverUrl?: string, totalPages?: number) => {
+    const initialTotal = totalPages && totalPages > 0 ? totalPages : 0;
     // Move old current book to in-progress (if it had progress)
     if (currentBook && currentBook.progress > 0) {
       setInProgressBooks((prev) => {
@@ -119,7 +120,7 @@ export function CurrentBookProvider({ children, userId }: { children: ReactNode;
       book,
       progress: 0,
       currentPage: 0,
-      totalPages: 0,
+      totalPages: initialTotal,
       coverUrl,
       rating: 0,
     };
@@ -137,7 +138,7 @@ export function CurrentBookProvider({ children, userId }: { children: ReactNode;
           book_year: book.year,
           reading_status: 'current',
           current_page: 0,
-          total_pages: 0,
+          total_pages: initialTotal,
           rating: 0,
           updated_at: new Date().toISOString(),
         },

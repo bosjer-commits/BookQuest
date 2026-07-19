@@ -12,7 +12,7 @@ import { SKIN_CATALOG } from '@/data/skins';
 import { USERS } from '@/data/users';
 import { createClient } from '@/lib/supabase/client';
 
-const KID_IDS = ['elliott', 'robin', 'simon', 'oliver', 'lucas'];
+const KID_IDS = ['annalyn', 'elliott', 'robin', 'simon', 'oliver', 'lucas'];
 
 type BookItem = {
   book: {

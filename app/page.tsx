@@ -13,7 +13,7 @@ export default function Home() {
   const router = useRouter();
   const { currentBook, finishedBooks, updateReadingProgress, updateRating, finishCurrentBook } = useCurrentBook();
   const { isChestCollected } = useChest();
-  const { canEditProgress, viewingProfile, isParentMode, activeProfile, logout, clearKidSelection, basePath } = useUser();
+  const { canEditProgress, viewingProfile, logout, basePath } = useUser();
   const [showProgressEdit, setShowProgressEdit] = useState(false);
   const [openingChestGoal, setOpeningChestGoal] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState('');
@@ -77,21 +77,6 @@ export default function Home() {
           <div className="text-sm font-bold brawl-text" style={{ color: '#F6D58A' }}>
             {viewingProfile?.name}
           </div>
-          {isParentMode && (
-            <div className="text-xs" style={{ color: '#C8B4FF' }}>
-              Managing: {viewingProfile?.name}
-            </div>
-          )}
-          {isParentMode && (
-            <button
-              type="button"
-              onClick={() => { clearKidSelection(); setShowUserMenu(false); }}
-              className="text-left text-xs font-bold py-1"
-              style={{ color: '#74B9FF' }}
-            >
-              Change Kid
-            </button>
-          )}
           <button
             type="button"
             onClick={() => { logout(); setShowUserMenu(false); }}
@@ -115,22 +100,6 @@ export default function Home() {
         className="flex-1 flex flex-col items-center px-4 pt-4 pb-0 gap-2 overflow-hidden min-h-0"
         style={{ paddingBottom: 'var(--nav-height)' }}
       >
-        {/* Parent mode indicator */}
-        {isParentMode && (
-          <div
-            className="w-full max-w-[320px] text-center text-xs font-bold brawl-text rounded-full py-1 px-3 shrink-0"
-            style={{
-              color: '#C8B4FF',
-              background: 'rgba(162,155,254,0.15)',
-              border: '1px solid rgba(162,155,254,0.3)',
-              marginTop: '-14px',
-              marginBottom: '-8px',
-            }}
-          >
-            Managing: {viewingProfile?.name}
-          </div>
-        )}
-
         {/* Book Frame */}
         <div className="w-full flex justify-center flex-1 min-h-0" style={{ marginTop: '-5px' }}>
           <div className="relative h-full flex items-center justify-center">

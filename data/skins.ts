@@ -74,6 +74,18 @@ export const SKIN_CATALOG: SkinDefinition[] = [
   { id: 'elliott-nani',     character: 'Nani',     owner: 'Elliot', asset: '/assets/Skins/Elliot/Legendary/Nani.png',    rarity: 'legendary' },
   { id: 'elliott-riko',     character: 'Riko',     owner: 'Elliot', asset: '/assets/Skins/Elliot/Legendary/Riko.png',    rarity: 'legendary' },
   { id: 'elliott-spike',    character: 'Spike',    owner: 'Elliot', asset: '/assets/Skins/Elliot/Legendary/Spike.png',   rarity: 'legendary' },
+
+  // Annalyn — Rare
+  { id: 'annalyn-blue',    character: 'Blue',    owner: 'Annalyn', asset: '/assets/Skins/Annalyn/blue.png',   rarity: 'rare' },
+  { id: 'annalyn-teal',    character: 'Teal',    owner: 'Annalyn', asset: '/assets/Skins/Annalyn/teal.png',   rarity: 'rare' },
+  { id: 'annalyn-peach',   character: 'Peach',   owner: 'Annalyn', asset: '/assets/Skins/Annalyn/peach.png',  rarity: 'rare' },
+  { id: 'annalyn-yellow',  character: 'Yellow',  owner: 'Annalyn', asset: '/assets/Skins/Annalyn/yellow.png', rarity: 'rare' },
+  // Annalyn — Epic
+  { id: 'annalyn-pink',    character: 'Pink',    owner: 'Annalyn', asset: '/assets/Skins/Annalyn/Pink.png',   rarity: 'epic' },
+  { id: 'annalyn-pink2',   character: 'Pink 2',  owner: 'Annalyn', asset: '/assets/Skins/Annalyn/pink2.png',  rarity: 'epic' },
+  // Annalyn — Legendary
+  { id: 'annalyn-ariel',   character: 'Ariel',   owner: 'Annalyn', asset: '/assets/Skins/Annalyn/ariel.png',  rarity: 'legendary' },
+  { id: 'annalyn-mulan',   character: 'Mulan',   owner: 'Annalyn', asset: '/assets/Skins/Annalyn/mulan.png',  rarity: 'legendary' },
 ];
 
 export type ChestTier = 'brawl' | 'big' | 'mega';

@@ -1,10 +1,8 @@
 'use client';
 
 import { ReactNode, useState, useEffect } from 'react';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useUser } from '@/contexts/UserContext';
-import { USERS } from '@/data/users';
 import { CHEST_TIERS } from '@/data/skins';
 import { CurrentBookProvider } from '@/contexts/CurrentBookContext';
 import { FavoritesProvider } from '@/contexts/FavoritesContext';
@@ -12,97 +10,6 @@ import { ChestProvider } from '@/contexts/ChestContext';
 import ProfileSelector from '@/components/ProfileSelector';
 import ChestOpeningModal from '@/components/ChestOpeningModal';
 import { createClient } from '@/lib/supabase/client';
-
-function getKidAvatar(name: string): string {
-  return `/assets/Skins/${name}_profile.png`;
-}
-
-function KidPicker() {
-  const { activeProfile, selectKid, logout } = useUser();
-  const kidProfiles = (activeProfile?.kids ?? []).map(
-    (id) => USERS.find((u) => u.id === id)!
-  );
-
-  return (
-    <div
-      className="fixed inset-0 flex flex-col items-center justify-center z-50"
-      style={{ background: 'var(--navy)' }}
-    >
-      <div
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[200px] pointer-events-none"
-        style={{
-          background:
-            'radial-gradient(ellipse at center top, rgba(162,155,254,0.15) 0%, transparent 70%)',
-        }}
-      />
-
-      <p
-        className="text-base font-bold brawl-text mb-2"
-        style={{ color: '#C8B4FF' }}
-      >
-        Welcome, {activeProfile?.name}!
-      </p>
-      <h2
-        className="text-2xl font-black brawl-text mb-8"
-        style={{
-          color: '#F6D58A',
-          textShadow: '-2px 0 #5A3C12, 2px 0 #5A3C12, 0 -2px #5A3C12, 0 2px #5A3C12',
-        }}
-      >
-        Whose progress?
-      </h2>
-
-      <div className="flex justify-center gap-8">
-        {kidProfiles.map((kid) => (
-          <button
-            key={kid.id}
-            type="button"
-            onClick={() => selectKid(kid.id)}
-            className="flex flex-col items-center gap-2 focus:outline-none"
-          >
-            <div
-              className="relative rounded-2xl overflow-hidden"
-              style={{
-                width: '110px',
-                height: '110px',
-                background: 'radial-gradient(ellipse at center, #3d8ba8 0%, #1a3a52 100%)',
-                border: '3px solid #74B9FF',
-                boxShadow: '0 0 20px rgba(116,185,255,0.5)',
-              }}
-            >
-              <Image
-                src={getKidAvatar(kid.name)}
-                alt={kid.name}
-                width={110}
-                height={110}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <span
-              className="text-base font-bold brawl-text"
-              style={{ color: '#7EC3FF' }}
-            >
-              {kid.name}
-            </span>
-          </button>
-        ))}
-      </div>
-
-      <button
-        type="button"
-        onClick={logout}
-        className="mt-10 px-6 py-2 rounded-full text-sm font-bold"
-        style={{
-          border: '2px solid rgba(116,185,255,0.4)',
-          color: 'rgba(116,185,255,0.7)',
-          background: 'transparent',
-        }}
-      >
-        Switch User
-      </button>
-    </div>
-  );
-}
 
 type WelcomeStep = 'checking' | 'welcome' | 'chest' | 'done';
 
@@ -177,25 +84,20 @@ function WelcomeFlow({ userId, children }: { userId: string; children: ReactNode
 }
 
 export default function UserDataProviders({ children }: { children: ReactNode }) {
-  const { activeUserId, viewingUserId, isParentMode } = useUser();
+  const { activeUserId, viewingUserId } = useUser();
   const pathname = usePathname();
 
   if (pathname.startsWith('/test')) return <>{children}</>;
 
-  if (!activeUserId) return <ProfileSelector />;
-  if (!viewingUserId) return <KidPicker />;
+  if (!activeUserId || !viewingUserId) return <ProfileSelector />;
 
   return (
     <CurrentBookProvider key={viewingUserId} userId={viewingUserId}>
       <FavoritesProvider key={viewingUserId} userId={viewingUserId}>
         <ChestProvider key={viewingUserId} userId={viewingUserId}>
-          {isParentMode ? (
-            children
-          ) : (
-            <WelcomeFlow key={viewingUserId} userId={viewingUserId}>
-              {children}
-            </WelcomeFlow>
-          )}
+          <WelcomeFlow key={viewingUserId} userId={viewingUserId}>
+            {children}
+          </WelcomeFlow>
         </ChestProvider>
       </FavoritesProvider>
     </CurrentBookProvider>
