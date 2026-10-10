@@ -10,6 +10,8 @@ interface ChestContextType {
   markChestCollected: (goal: number) => void;
   isChestCollected: (goal: number) => boolean;
   isSkinUnlocked: (skinId: string) => boolean;
+  /** True when the saved data couldn't be loaded (e.g. the database is unreachable). */
+  loadError?: boolean;
 }
 
 export const ChestContext = createContext<ChestContextType | undefined>(undefined);
@@ -17,6 +19,7 @@ export const ChestContext = createContext<ChestContextType | undefined>(undefine
 export function ChestProvider({ children, userId }: { children: ReactNode; userId: string }) {
   const [unlockedSkins, setUnlockedSkins] = useState<string[]>([]);
   const [collectedChests, setCollectedChests] = useState<number[]>([]);
+  const [loadError, setLoadError] = useState(false);
   const supabase = createClient();
 
   // Load from Supabase on mount / userId change
@@ -35,6 +38,10 @@ export function ChestProvider({ children, userId }: { children: ReactNode; userI
 
       if (skinsRes.error) console.error('Failed to load skins:', skinsRes.error);
       if (chestsRes.error) console.error('Failed to load chests:', chestsRes.error);
+      if (skinsRes.error || chestsRes.error) {
+        setLoadError(true);
+        return;
+      }
 
       setUnlockedSkins(skinsRes.data?.map((r) => r.skin_id) ?? []);
       setCollectedChests(chestsRes.data?.map((r) => r.chest_goal) ?? []);
@@ -96,6 +103,7 @@ export function ChestProvider({ children, userId }: { children: ReactNode; userI
         markChestCollected,
         isChestCollected,
         isSkinUnlocked,
+        loadError,
       }}
     >
       {children}

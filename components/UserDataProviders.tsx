@@ -4,26 +4,62 @@ import { ReactNode, useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { useUser } from '@/contexts/UserContext';
 import { CHEST_TIERS } from '@/data/skins';
-import { CurrentBookProvider } from '@/contexts/CurrentBookContext';
-import { FavoritesProvider } from '@/contexts/FavoritesContext';
-import { ChestProvider } from '@/contexts/ChestContext';
+import { CurrentBookProvider, useCurrentBook } from '@/contexts/CurrentBookContext';
+import { FavoritesProvider, useFavorites } from '@/contexts/FavoritesContext';
+import { ChestProvider, useChest } from '@/contexts/ChestContext';
 import ProfileSelector from '@/components/ProfileSelector';
 import ChestOpeningModal from '@/components/ChestOpeningModal';
 import { createClient } from '@/lib/supabase/client';
 
-type WelcomeStep = 'checking' | 'welcome' | 'chest' | 'done';
+type WelcomeStep = 'checking' | 'welcome' | 'chest' | 'done' | 'offline';
+
+// Shown when saved data can't be loaded, so kids don't think their progress is gone
+// (and aren't offered their first chest again).
+function OfflineScreen() {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-5 px-6 text-center"
+      style={{ background: '#162544' }}
+    >
+      <div className="text-2xl font-bold brawl-text" style={{ color: '#F6D58A' }}>
+        Can&apos;t reach Book Quest right now
+      </div>
+      <div className="text-base text-white max-w-[340px]">
+        Don&apos;t worry, your books and chests are safe. Please try again in a little while.
+      </div>
+      <button
+        type="button"
+        onClick={() => window.location.reload()}
+        className="px-6 py-3 rounded-xl text-lg font-bold brawl-text text-white"
+        style={{ background: '#74B9FF' }}
+      >
+        Try again
+      </button>
+    </div>
+  );
+}
 
 function WelcomeFlow({ userId, children }: { userId: string; children: ReactNode }) {
   const [step, setStep] = useState<WelcomeStep>('checking');
   const supabase = createClient();
+  const booksLoadError = useCurrentBook().loadError;
+  const favoritesLoadError = useFavorites().loadError;
+  const chestsLoadError = useChest().loadError;
 
   useEffect(() => {
     async function check() {
-      const { data } = await supabase
+      // maybeSingle: a kid with no row yet is a new user (data null, no error);
+      // a real error means the database is unreachable, not that they're new.
+      const { data, error } = await supabase
         .from('user_state')
         .select('welcomed')
         .eq('user_id', userId)
-        .single();
+        .maybeSingle();
+      if (error) {
+        console.error('Failed to load welcomed state:', error);
+        setStep('offline');
+        return;
+      }
       setStep(data?.welcomed ? 'done' : 'welcome');
     }
     check();
@@ -37,6 +73,10 @@ function WelcomeFlow({ userId, children }: { userId: string; children: ReactNode
       .then(({ error }) => { if (error) console.error('Failed to save welcomed state:', error); });
     setStep('done');
   };
+
+  if (step === 'offline' || booksLoadError || favoritesLoadError || chestsLoadError) {
+    return <OfflineScreen />;
+  }
 
   if (step === 'checking') return null;
 

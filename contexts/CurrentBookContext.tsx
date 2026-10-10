@@ -34,6 +34,8 @@ interface CurrentBookContextType {
   clearCurrentBook: () => void;
   removeInProgressBook: (bookTitle: string) => void;
   removeFinishedBook: (bookTitle: string) => void;
+  /** True when the saved data couldn't be loaded (e.g. the database is unreachable). */
+  loadError?: boolean;
 }
 
 // Map a DB row to CurrentBookData
@@ -63,6 +65,7 @@ export function CurrentBookProvider({ children, userId }: { children: ReactNode;
   const [currentBook, setCurrentBookState] = useState<CurrentBookData | null>(null);
   const [inProgressBooks, setInProgressBooks] = useState<CurrentBookData[]>([]);
   const [finishedBooks, setFinishedBooks] = useState<CurrentBookData[]>([]);
+  const [loadError, setLoadError] = useState(false);
   const supabase = createClient();
 
   // Load from Supabase on mount / userId change
@@ -76,6 +79,7 @@ export function CurrentBookProvider({ children, userId }: { children: ReactNode;
 
       if (error) {
         console.error('Failed to load books:', error);
+        setLoadError(true);
         return;
       }
 
@@ -307,6 +311,7 @@ export function CurrentBookProvider({ children, userId }: { children: ReactNode;
         clearCurrentBook,
         removeInProgressBook,
         removeFinishedBook,
+        loadError,
       }}
     >
       {children}

@@ -24,12 +24,15 @@ interface FavoritesContextType {
   addFavorite: (book: Book, coverUrl?: string) => void;
   removeFavorite: (bookTitle: string) => void;
   isFavorite: (bookTitle: string) => boolean;
+  /** True when the saved data couldn't be loaded (e.g. the database is unreachable). */
+  loadError?: boolean;
 }
 
 export const FavoritesContext = createContext<FavoritesContextType | undefined>(undefined);
 
 export function FavoritesProvider({ children, userId }: { children: ReactNode; userId: string }) {
   const [favorites, setFavorites] = useState<FavoriteBook[]>([]);
+  const [loadError, setLoadError] = useState(false);
   const supabase = createClient();
 
   // Load from Supabase on mount / userId change
@@ -44,6 +47,7 @@ export function FavoritesProvider({ children, userId }: { children: ReactNode; u
 
       if (error) {
         console.error('Failed to load favorites:', error);
+        setLoadError(true);
         return;
       }
 
@@ -108,7 +112,7 @@ export function FavoritesProvider({ children, userId }: { children: ReactNode; u
   };
 
   return (
-    <FavoritesContext.Provider value={{ favorites, addFavorite, removeFavorite, isFavorite }}>
+    <FavoritesContext.Provider value={{ favorites, addFavorite, removeFavorite, isFavorite, loadError }}>
       {children}
     </FavoritesContext.Provider>
   );
