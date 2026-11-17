@@ -10,6 +10,7 @@ import ProfileSelector from '@/components/ProfileSelector';
 import ChestOpeningModal from '@/components/ChestOpeningModal';
 import { createClient } from '@/lib/supabase/client';
 import { onSaved } from '@/lib/saveError';
+import { logVisit } from '@/lib/visits';
 import SaveErrorToast from '@/components/SaveErrorToast';
 import { GOLD, BLUE, NAVY } from '@/lib/theme';
 
@@ -127,6 +128,11 @@ function WelcomeFlow({ userId, children }: { userId: string; children: ReactNode
 
 export default function UserDataProviders({ children }: { children: ReactNode }) {
   const { activeUserId, viewingUserId } = useUser();
+
+  // Record the visit once a profile is active (see lib/visits.ts).
+  useEffect(() => {
+    if (activeUserId) logVisit(activeUserId);
+  }, [activeUserId]);
   if (!activeUserId || !viewingUserId) return <ProfileSelector />;
 
   return (

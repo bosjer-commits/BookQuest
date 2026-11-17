@@ -56,3 +56,15 @@ CREATE TABLE IF NOT EXISTS collected_chests (
   collected_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY (user_id, chest_goal)
 );
+
+-- ─── 5. visits ──────────────────────────────────────────────────────────────
+-- Usage log: one row each time a kid opens the app (at most one per 30 minutes,
+-- enforced in lib/visits.ts). Used only to see who uses the app and how often.
+
+CREATE TABLE IF NOT EXISTS visits (
+  id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  user_id    TEXT        NOT NULL,
+  visited_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS visits_user_time ON visits (user_id, visited_at);
