@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import CoverButton from '@/components/CoverButton';
 import { BLACK_OUTLINE } from '@/lib/theme';
 
 interface BookDisplayProps {
@@ -11,6 +12,8 @@ interface BookDisplayProps {
   onPrevBook: () => void;
   onNextBook: () => void;
   onInfoClick: () => void;
+  /** Shown as a badge on the frame when the kid may change this book's cover. */
+  onChangeCover?: () => void;
 }
 
 export default function BookDisplay({
@@ -21,6 +24,7 @@ export default function BookDisplay({
   onPrevBook,
   onNextBook,
   onInfoClick,
+  onChangeCover,
 }: BookDisplayProps) {
   return (
     <div className="flex-1 min-h-0 flex items-center justify-center">
@@ -145,6 +149,10 @@ export default function BookDisplay({
           >
             <Image src="/assets/info.png" alt="" width={40} height={40} />
           </button>
+
+          {onChangeCover && (
+            <CoverButton onClick={onChangeCover} style={{ left: '-4px', top: '8px' }} />
+          )}
         </div>
       </div>
     </div>

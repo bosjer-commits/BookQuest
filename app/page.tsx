@@ -7,14 +7,17 @@ import UserMenu from '@/components/UserMenu';
 import ChestShelf from '@/components/ChestShelf';
 import ProgressEditModal from '@/components/ProgressEditModal';
 import ChestOpeningModal from '@/components/ChestOpeningModal';
+import CoverButton from '@/components/CoverButton';
+import CoverPickerModal from '@/components/CoverPickerModal';
 import { useCurrentBook } from '@/contexts/CurrentBookContext';
 import { useUser } from '@/contexts/UserContext';
 
 export default function Home() {
   const router = useRouter();
-  const { currentBook, finishedBooks } = useCurrentBook();
+  const { currentBook, finishedBooks, setBookCover } = useCurrentBook();
   const { canEditProgress, basePath } = useUser();
   const [showProgressEdit, setShowProgressEdit] = useState(false);
+  const [showCoverPicker, setShowCoverPicker] = useState(false);
   const [openingChestGoal, setOpeningChestGoal] = useState<number | null>(null);
 
   const percent = currentBook?.progress ?? 0;
@@ -76,6 +79,10 @@ export default function Home() {
               }}
               className="block"
             />
+
+            {hasCurrentBook && canEditProgress && (
+              <CoverButton onClick={() => setShowCoverPicker(true)} style={{ right: '-4px', top: '8px' }} />
+            )}
           </div>
 
           <div className="mt-2 text-center text-white font-semibold brawl-text" />
@@ -122,6 +129,18 @@ export default function Home() {
 
       {showProgressEdit && canEditProgress && (
         <ProgressEditModal onClose={() => setShowProgressEdit(false)} />
+      )}
+
+      {showCoverPicker && currentBook && (
+        <CoverPickerModal
+          title={currentBook.book.title}
+          author={currentBook.book.author}
+          onPick={(url) => {
+            setBookCover(currentBook.book.title, url);
+            setShowCoverPicker(false);
+          }}
+          onClose={() => setShowCoverPicker(false)}
+        />
       )}
 
       <ChestOpeningModal

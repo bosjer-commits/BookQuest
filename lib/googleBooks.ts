@@ -454,24 +454,126 @@ async function openLibraryCoverCandidates(query: string): Promise<number[]> {
   }
 }
 
-// Covers to choose from for a free-text query (normally "title author").
-// Unlike findCover this does not try to pick the right one: the kid does that by eye.
-export async function findCoverCandidates(query: string, max = 24): Promise<CoverCandidate[]> {
-  const q = query.trim();
-  if (!q) return [];
+// Apple Books has real cover art for most ebooks. Searched in the Dutch, Swedish and
+// US stores, since the kids read in all three languages.
+async function appleCoverCandidates(query: string): Promise<CoverCandidate[]> {
+  const perCountry = await Promise.all(
+    ['nl', 'se', 'us'].map(async (country) => {
+      try {
+        const params = new URLSearchParams({ term: query, media: 'ebook', country, limit: '10' });
+        const response = await fetch(`https://itunes.apple.com/search?${params.toString()}`);
+        if (!response.ok) return [];
+        const data = (await response.json()) as { results?: { artworkUrl100?: string }[] };
+        return (data.results ?? [])
+          .map((r) => r.artworkUrl100)
+          .filter((art): art is string => Boolean(art))
+          .map((art) => ({
+            url: art.replace('100x100bb', '600x600bb'),
+            thumb: art.replace('100x100bb', '300x300bb'),
+          }));
+      } catch (error) {
+        console.warn('Apple Books cover search failed:', error);
+        return [];
+      }
+    })
+  );
+  return interleave(perCountry);
+}
 
-  const [google, openLibrary] = await Promise.all([
-    googleCoverCandidates(q),
+// Takes one from each list in turn, so no single source fills the first rows.
+function interleave<T>(lists: T[][]): T[] {
+  const out: T[] = [];
+  const longest = Math.max(0, ...lists.map((l) => l.length));
+  for (let i = 0; i < longest; i += 1) {
+    for (const list of lists) if (i < list.length) out.push(list[i]);
+  }
+  return out;
+}
+
+// Google Books often has no real cover and returns a scan of the title page instead:
+// a white page with black letters. This spots those by looking at the pixels
+// (through /api/cover-proxy, because the browser may not read another site's image).
+function isPlainPage(url: string): Promise<boolean> {
+  if (typeof window === 'undefined') return Promise.resolve(false);
+  return new Promise((resolve) => {
+    const img = new window.Image();
+    const timer = setTimeout(() => resolve(false), 7000);
+    const finish = (plain: boolean) => {
+      clearTimeout(timer);
+      resolve(plain);
+    };
+    img.onerror = () => finish(false);
+    img.onload = () => {
+      try {
+        const w = 24;
+        const h = 36;
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return finish(false);
+        ctx.drawImage(img, 0, 0, w, h);
+        const { data } = ctx.getImageData(0, 0, w, h);
+        let paper = 0;
+        let colourless = 0;
+        for (let i = 0; i < data.length; i += 4) {
+          const max = Math.max(data[i], data[i + 1], data[i + 2]);
+          const min = Math.min(data[i], data[i + 1], data[i + 2]);
+          if (max - min < 30) {
+            colourless += 1;
+            if (max > 180) paper += 1;
+          }
+        }
+        const total = w * h;
+        finish(paper / total > 0.7 && colourless / total > 0.9);
+      } catch {
+        finish(false);
+      }
+    };
+    img.src = `/api/cover-proxy?url=${encodeURIComponent(url)}`;
+  });
+}
+
+async function coversForQuery(q: string): Promise<CoverCandidate[]> {
+  const [apple, openLibraryIds, googleUrls] = await Promise.all([
+    appleCoverCandidates(q),
     openLibraryCoverCandidates(q),
+    googleCoverCandidates(q),
   ]);
 
-  const candidates: CoverCandidate[] = [
-    ...google.map((url) => ({ url, thumb: url })),
-    ...openLibrary.map((id) => ({
-      url: `https://covers.openlibrary.org/b/id/${id}-L.jpg`,
-      thumb: `https://covers.openlibrary.org/b/id/${id}-M.jpg`,
-    })),
-  ];
+  const openLibrary = openLibraryIds.map((id) => ({
+    url: `https://covers.openlibrary.org/b/id/${id}-L.jpg`,
+    thumb: `https://covers.openlibrary.org/b/id/${id}-M.jpg`,
+  }));
+
+  // Title-page scans are dropped entirely: a page of text is never a useful cover.
+  const plainFlags = await Promise.all(googleUrls.map(isPlainPage));
+  const google = googleUrls.filter((_, i) => !plainFlags[i]).map((url) => ({ url, thumb: url }));
+
+  // Mixed across sources, so no single one fills the first rows.
+  return interleave([apple, openLibrary, google]);
+}
+
+// Covers to choose from for a free-text query (normally "title author").
+// Unlike findCover this does not try to pick the right one: the kid does that by eye.
+export async function findCoverCandidates(query: string, max = 30): Promise<CoverCandidate[]> {
+  const words = query
+    .replace(/[^\p{L}\p{N}]+/gu, ' ')
+    .trim()
+    .split(' ')
+    .filter(Boolean);
+  if (words.length === 0) return [];
+
+  // A misspelt or over-specific title finds little. When that happens, try again
+  // with the last word dropped (up to twice), which usually lands on the series.
+  let candidates: CoverCandidate[] = [];
+  for (let attempt = 0; attempt < 3 && words.length > 0; attempt += 1) {
+    const found = await coversForQuery(words.join(' '));
+    candidates = [...candidates, ...found];
+    if (candidates.length >= 6) break;
+    words.pop();
+    if (words.join('').length < 3) break;
+  }
 
   const seen = new Set<string>();
   return candidates

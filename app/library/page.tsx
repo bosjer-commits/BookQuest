@@ -16,7 +16,7 @@ import { getCoverOverrideByIsbn, getCoverOverrideByTitleAuthor } from '@/data/co
 import { useCurrentBook } from '@/contexts/CurrentBookContext';
 import { useFavorites } from '@/contexts/FavoritesContext';
 import { useUser } from '@/contexts/UserContext';
-import { BLUE, GOLD, GOLD_OUTLINE } from '@/lib/theme';
+import { GOLD, GOLD_OUTLINE } from '@/lib/theme';
 
 function LibraryContent() {
   const router = useRouter();
@@ -285,6 +285,7 @@ function LibraryContent() {
             onPrevBook={prevBook}
             onNextBook={nextBook}
             onInfoClick={() => setShowInfo(true)}
+            onChangeCover={isOnMyShelf ? () => setShowCoverPicker(true) : undefined}
           />
 
           <BookInfoSection
@@ -368,16 +369,6 @@ function LibraryContent() {
                   <div className="truncate">Author: {currentBook.author}</div>
                   {currentBook.year > 0 && <div>Year: {currentBook.year}</div>}
                   {currentBook.ageRange && <div>Age Range: {currentBook.ageRange}</div>}
-                  {isOnMyShelf && (
-                    <button
-                      type="button"
-                      onClick={() => setShowCoverPicker(true)}
-                      className="text-[13px] underline"
-                      style={{ color: BLUE }}
-                    >
-                      Change cover
-                    </button>
-                  )}
                 </div>
 
                 <div className="relative mt-[60px] w-full flex-1 flex items-center justify-center">

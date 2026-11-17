@@ -3,14 +3,12 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { useCurrentBook } from '@/contexts/CurrentBookContext';
-import CoverPickerModal from '@/components/CoverPickerModal';
-import { BLUE, GOLD, GOLD_OUTLINE } from '@/lib/theme';
+import { GOLD, GOLD_OUTLINE } from '@/lib/theme';
 
 // Full-screen dialog for the current book: set pages, rate it, mark it finished.
 // Render it only while open, so the fields start from the book's saved values.
 export default function ProgressEditModal({ onClose }: { onClose: () => void }) {
-  const { currentBook, updateReadingProgress, updateRating, finishCurrentBook, setBookCover } = useCurrentBook();
-  const [showCoverPicker, setShowCoverPicker] = useState(false);
+  const { currentBook, updateReadingProgress, updateRating, finishCurrentBook } = useCurrentBook();
   const [currentPage, setCurrentPage] = useState(currentBook?.currentPage?.toString() || '');
   const [totalPages, setTotalPages] = useState(currentBook?.totalPages?.toString() || '');
   const rating = currentBook?.rating ?? 0;
@@ -36,7 +34,6 @@ export default function ProgressEditModal({ onClose }: { onClose: () => void }) 
   };
 
   return (
-    <>
     <div
       className="fixed inset-0 bg-[var(--navy)] flex items-center justify-center z-50 p-4"
       onClick={onClose}
@@ -61,14 +58,7 @@ export default function ProgressEditModal({ onClose }: { onClose: () => void }) 
             Book Progress
           </h3>
 
-          <button
-            type="button"
-            onClick={() => setShowCoverPicker(true)}
-            className="mt-[9px] -mb-[3px] h-[22px] shrink-0 px-3 rounded-full text-[12px] font-bold leading-none"
-            style={{ color: BLUE, background: 'rgba(22,37,68,0.92)', border: `1.5px solid ${BLUE}` }}
-          >
-            Change cover
-          </button>
+          <div className="mt-3 h-4" />
 
           <div className="mt-6 w-full space-y-6">
             <div className="space-y-2">
@@ -189,17 +179,5 @@ export default function ProgressEditModal({ onClose }: { onClose: () => void }) 
       </div>
     </div>
 
-    {showCoverPicker && currentBook && (
-      <CoverPickerModal
-        title={currentBook.book.title}
-        author={currentBook.book.author}
-        onPick={(url) => {
-          setBookCover(currentBook.book.title, url);
-          setShowCoverPicker(false);
-        }}
-        onClose={() => setShowCoverPicker(false)}
-      />
-    )}
-    </>
   );
 }

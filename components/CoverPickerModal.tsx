@@ -18,17 +18,20 @@ export default function CoverPickerModal({ title, author, onPick, onClose }: Cov
   const [covers, setCovers] = useState<CoverCandidate[]>([]);
   const [loading, setLoading] = useState(true);
   const seqRef = useRef(0);
+  const isFirstSearch = useRef(true);
 
   // Search when opened and again (after a pause) whenever the words change.
   useEffect(() => {
     const seq = ++seqRef.current;
+    const wait = isFirstSearch.current ? 0 : 800;
+    isFirstSearch.current = false;
     const timer = setTimeout(async () => {
       setLoading(true);
       const found = await findCoverCandidates(query);
       if (seq !== seqRef.current) return; // a newer search superseded this one
       setCovers(found);
       setLoading(false);
-    }, 500);
+    }, wait);
     return () => clearTimeout(timer);
   }, [query]);
 
