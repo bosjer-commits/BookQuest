@@ -160,8 +160,10 @@ body {
 /* App Container - Main content wrapper */
 .app-container {
   position: fixed;
+  /* Sized by inset only, never by 100dvh: the bottom bar is also fixed to the
+     screen edge, so both always agree on where the bottom is. On some phones
+     100dvh is taller than the visible area, which pushed content under the bar. */
   inset: 0;
-  height: 100dvh;
 
   /* Mobile-first: Full screen with minimal padding */
   margin: 0;
