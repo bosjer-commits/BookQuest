@@ -406,3 +406,75 @@ export async function findCover(title: string, author: string): Promise<string |
   }
   return findOpenLibraryCover(title, author);
 }
+
+export interface CoverCandidate {
+  /** The image saved as the book's cover. */
+  url: string;
+  /** A smaller version of the same image, for showing many at once. */
+  thumb: string;
+}
+
+async function googleCoverCandidates(query: string): Promise<string[]> {
+  const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(
+    query
+  )}&maxResults=20&printType=books${keyParam}`;
+
+  // Same flakiness as searchBooks: retry a few times before giving up.
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      const response = await fetch(url);
+      if (response.ok) {
+        const data = (await response.json()) as {
+          items?: { volumeInfo?: { imageLinks?: { thumbnail?: string; smallThumbnail?: string } } }[];
+        };
+        const covers = (data.items ?? [])
+          .map((item) => item.volumeInfo?.imageLinks?.thumbnail || item.volumeInfo?.imageLinks?.smallThumbnail)
+          .filter((link): link is string => Boolean(link))
+          .map((link) => link.replace('http://', 'https://').replace('&edge=curl', ''));
+        if (covers.length > 0) return covers;
+      }
+    } catch (error) {
+      console.warn('Google Books cover search failed:', error);
+    }
+    await delay(250);
+  }
+  return [];
+}
+
+async function openLibraryCoverCandidates(query: string): Promise<number[]> {
+  try {
+    const params = new URLSearchParams({ q: query, limit: '20', fields: 'cover_i' });
+    const response = await fetch(`https://openlibrary.org/search.json?${params.toString()}`);
+    if (!response.ok) return [];
+    const data = (await response.json()) as OpenLibrarySearchResult;
+    return (data.docs ?? []).map((d) => d.cover_i).filter((id): id is number => Boolean(id));
+  } catch (error) {
+    console.warn('Open Library cover search failed:', error);
+    return [];
+  }
+}
+
+// Covers to choose from for a free-text query (normally "title author").
+// Unlike findCover this does not try to pick the right one: the kid does that by eye.
+export async function findCoverCandidates(query: string, max = 24): Promise<CoverCandidate[]> {
+  const q = query.trim();
+  if (!q) return [];
+
+  const [google, openLibrary] = await Promise.all([
+    googleCoverCandidates(q),
+    openLibraryCoverCandidates(q),
+  ]);
+
+  const candidates: CoverCandidate[] = [
+    ...google.map((url) => ({ url, thumb: url })),
+    ...openLibrary.map((id) => ({
+      url: `https://covers.openlibrary.org/b/id/${id}-L.jpg`,
+      thumb: `https://covers.openlibrary.org/b/id/${id}-M.jpg`,
+    })),
+  ];
+
+  const seen = new Set<string>();
+  return candidates
+    .filter((c) => (seen.has(c.url) ? false : (seen.add(c.url), true)))
+    .slice(0, max);
+}

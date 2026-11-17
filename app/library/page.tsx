@@ -9,19 +9,20 @@ import CategorySelector from '@/components/CategorySelector';
 import BookDisplay from '@/components/BookDisplay';
 import BookInfoSection from '@/components/BookInfoSection';
 import BookSearchModal, { type PickedBook } from '@/components/BookSearchModal';
+import CoverPickerModal from '@/components/CoverPickerModal';
 import { prizeCategories, type PrizeCategory } from '@/data/categories';
 import { searchBook, getBookCoverUrl, fetchOpenLibraryCover } from '@/lib/googleBooks';
 import { getCoverOverrideByIsbn, getCoverOverrideByTitleAuthor } from '@/data/coverOverrides';
 import { useCurrentBook } from '@/contexts/CurrentBookContext';
 import { useFavorites } from '@/contexts/FavoritesContext';
 import { useUser } from '@/contexts/UserContext';
-import { GOLD, GOLD_OUTLINE } from '@/lib/theme';
+import { BLUE, GOLD, GOLD_OUTLINE } from '@/lib/theme';
 
 function LibraryContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const didInitFromQuery = useRef(false);
-  const { setCurrentBook, finishedBooks } = useCurrentBook();
+  const { setCurrentBook, setBookCover, finishedBooks, inProgressBooks, currentBook: readingNow } = useCurrentBook();
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
   const { canEditProgress, basePath } = useUser();
   const [categoryIndex, setCategoryIndex] = useState(0);
@@ -31,6 +32,7 @@ function LibraryContent() {
   const [loading, setLoading] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
+  const [showCoverPicker, setShowCoverPicker] = useState(false);
   const coverCacheKey = 'bookquest_cover_cache_v1';
   const coverCacheTtlMs = 90 * 24 * 60 * 60 * 1000;
 
@@ -40,6 +42,11 @@ function LibraryContent() {
   const currentCategory = prizeCategories[categoryIndex];
   const currentBook = customBook ?? currentCategory.books[bookIndex];
   const isFinished = finishedBooks.some((b) => b.book.title === currentBook.title);
+  // The cover can be changed for books the kid is reading or has read.
+  const isOnMyShelf =
+    isFinished ||
+    readingNow?.book.title === currentBook.title ||
+    inProgressBooks.some((b) => b.book.title === currentBook.title);
 
   const handleStartReading = () => {
     if (setCurrentBook(currentBook, coverUrl || undefined) === false) return;
@@ -102,6 +109,10 @@ function LibraryContent() {
 
   // Fetch book cover and description when book changes
   useEffect(() => {
+    // Set when the shown book changes, so a slow lookup for the previous book
+    // can't overwrite the cover and description of the one now on screen.
+    let cancelled = false;
+
     const fetchBookData = async () => {
       setLoading(true);
       setCoverUrl(null);
@@ -132,6 +143,7 @@ function LibraryContent() {
       }
 
       const result = await searchBook(currentBook.title, currentBook.author);
+      if (cancelled) return;
       const url = getBookCoverUrl(result);
 
       const isbn = result?.isbn;
@@ -153,6 +165,7 @@ function LibraryContent() {
           currentBook.author,
           isbn
         );
+        if (cancelled) return;
       }
 
       setCoverUrl(finalUrl);
@@ -168,6 +181,9 @@ function LibraryContent() {
     };
 
     fetchBookData();
+    return () => {
+      cancelled = true;
+    };
   }, [bookIndex, currentBook.title, currentBook.author]);
 
   useEffect(() => {
@@ -290,6 +306,19 @@ function LibraryContent() {
         />
       )}
 
+      {showCoverPicker && (
+        <CoverPickerModal
+          title={currentBook.title}
+          author={currentBook.author}
+          onPick={(url) => {
+            setBookCover(currentBook.title, url);
+            setCoverUrl(url);
+            setShowCoverPicker(false);
+          }}
+          onClose={() => setShowCoverPicker(false)}
+        />
+      )}
+
       {/* Info Overlay */}
       {showInfo && (
         <div
@@ -339,6 +368,16 @@ function LibraryContent() {
                   <div className="truncate">Author: {currentBook.author}</div>
                   {currentBook.year > 0 && <div>Year: {currentBook.year}</div>}
                   {currentBook.ageRange && <div>Age Range: {currentBook.ageRange}</div>}
+                  {isOnMyShelf && (
+                    <button
+                      type="button"
+                      onClick={() => setShowCoverPicker(true)}
+                      className="text-[13px] underline"
+                      style={{ color: BLUE }}
+                    >
+                      Change cover
+                    </button>
+                  )}
                 </div>
 
                 <div className="relative mt-[60px] w-full flex-1 flex items-center justify-center">
