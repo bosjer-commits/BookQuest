@@ -1,12 +1,4 @@
-export interface Book {
-  year: number;
-  title: string;
-  author: string;
-  publisher?: string;
-  cover?: string;
-  summary?: string;
-  ageRange?: string;
-}
+import type { Book } from '@/lib/types';
 
 export const newberyMedalWinners: Book[] = [
   { year: 1936, title: 'Caddie Woodlawn', author: 'Carol Ryrie Brink', summary: 'Caddie is a bold girl on the Wisconsin frontier who refuses to be tamed. A lively and spirited story based on a real girl.', ageRange: '9–12' },

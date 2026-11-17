@@ -2,14 +2,9 @@
 
 import Image from 'next/image';
 import BookFrame from './BookFrame';
+import type { ShelfBook } from '@/lib/types';
 
-type BookItem = {
-  book: {
-    title: string;
-    author: string;
-  };
-  coverUrl?: string;
-};
+type BookItem = ShelfBook;
 
 type Friend = {
   id: string;

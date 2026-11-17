@@ -11,6 +11,7 @@ import ChestOpeningModal from '@/components/ChestOpeningModal';
 import { createClient } from '@/lib/supabase/client';
 import { onSaved } from '@/lib/saveError';
 import SaveErrorToast from '@/components/SaveErrorToast';
+import { GOLD, BLUE, NAVY } from '@/lib/theme';
 
 type WelcomeStep = 'checking' | 'welcome' | 'chest' | 'done' | 'offline';
 
@@ -20,9 +21,9 @@ function OfflineScreen() {
   return (
     <div
       className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-5 px-6 text-center"
-      style={{ background: '#162544' }}
+      style={{ background: NAVY }}
     >
-      <div className="text-2xl font-bold brawl-text" style={{ color: '#F6D58A' }}>
+      <div className="text-2xl font-bold brawl-text" style={{ color: GOLD }}>
         Can&apos;t reach Book Quest right now
       </div>
       <div className="text-base text-white max-w-[340px]">
@@ -32,7 +33,7 @@ function OfflineScreen() {
         type="button"
         onClick={() => window.location.reload()}
         className="px-6 py-3 rounded-xl text-lg font-bold brawl-text text-white"
-        style={{ background: '#74B9FF' }}
+        style={{ background: BLUE }}
       >
         Try again
       </button>
@@ -97,7 +98,7 @@ function WelcomeFlow({ userId, children }: { userId: string; children: ReactNode
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden"
-      style={{ background: '#162544' }}
+      style={{ background: NAVY }}
     >
       <button
         type="button"

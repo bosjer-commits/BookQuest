@@ -1,69 +1,35 @@
-export type UserRole = 'parent' | 'kid'
-export type LanguagePreference = 'dutch' | 'swedish' | 'english'
-export type BookStatus = 'favorites' | 'in_progress' | 'finished'
+// Shared types for books as the app shows and stores them.
 
-export interface Profile {
-  id: string
-  display_name: string
-  role: UserRole
-  language_preference: LanguagePreference
-  avatar_url?: string
-  currently_reading_book_id?: string
-  created_at: string
-}
-
+/** A book as listed in the award data files or picked from search. */
 export interface Book {
-  id: string
-  user_id: string
-  title: string
-  author?: string
-  cover_url?: string
-  year_published?: number
-  description?: string
-  total_pages?: number
-  status: BookStatus
-  pages_read: number
-  rating?: number
-  started_at?: string
-  finished_at?: string
-  created_at: string
-  updated_at: string
+  year: number;
+  title: string;
+  author: string;
+  illustrator?: string;
+  publisher?: string;
+  cover?: string;
+  summary?: string;
+  ageRange?: string;
 }
 
-export interface Friendship {
-  id: string
-  user_id_1: string
-  user_id_2: string
-  created_at: string
+/** A book on a shelf: favorites, in progress, finished, or a friend's row. */
+export interface ShelfBook {
+  book: { title: string; author: string; year?: number };
+  coverUrl?: string;
 }
 
-export interface BookCollection {
-  id: string
-  name: string
-  description?: string
-  language: 'dutch' | 'swedish' | 'english' | 'all'
-  created_by?: string
-  created_at: string
-}
-
-export interface CollectionBook {
-  id: string
-  collection_id: string
-  title: string
-  author?: string
-  cover_url?: string
-  year_published?: number
-  description?: string
-  total_pages?: number
-  created_at: string
-}
-
-export interface GoogleBook {
-  id: string
-  title: string
-  authors?: string[]
-  thumbnail?: string
-  pageCount?: number
-  publishedDate?: string
-  description?: string
+/** One row of the user_books table (see supabase/schema.sql). */
+export interface UserBookRow {
+  user_id: string;
+  title: string;
+  author: string;
+  cover_url: string | null;
+  book_year: number | null;
+  is_favorite: boolean;
+  favorited_at: number | null;
+  reading_status: 'current' | 'in_progress' | 'finished' | null;
+  current_page: number | null;
+  total_pages: number | null;
+  rating: number | null;
+  updated_at: string;
 }

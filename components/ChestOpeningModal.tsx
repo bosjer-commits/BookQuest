@@ -12,6 +12,7 @@ import {
   rollSkin,
   tryUpgrade,
 } from '@/data/skins';
+import { NAVY } from '@/lib/theme';
 
 // Phase flow:
 // shimmer → upgrade1 → upgrade2 → upgrade3 → ready → opening → revealing → done
@@ -167,7 +168,7 @@ export default function ChestOpeningModal({ isOpen, onClose, chestGoal }: ChestO
     <div
       ref={containerRef}
       className={`fixed inset-0 z-50 flex flex-col items-center justify-center ${shaking ? 'screen-shake' : ''}`}
-      style={{ background: '#162544' }}
+      style={{ background: NAVY }}
       onClick={handleTap}
     >
       {/* White flash overlay on upgrade */}

@@ -2,17 +2,9 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { loadUserBooks } from '@/lib/userBooks';
+import type { Book, UserBookRow } from '@/lib/types';
 import { onSaved } from '@/lib/saveError';
-
-interface Book {
-  year: number;
-  title: string;
-  author: string;
-  illustrator?: string;
-  cover?: string;
-  summary?: string;
-  ageRange?: string;
-}
 
 interface CurrentBookData {
   book: Book;
@@ -41,14 +33,13 @@ interface CurrentBookContextType {
 }
 
 // Map a DB row to CurrentBookData
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function rowToBookData(row: any): CurrentBookData {
+function rowToBookData(row: UserBookRow): CurrentBookData {
   const safeTotal = Math.max(1, row.total_pages ?? 0);
   const safeCurrent = Math.min(Math.max(0, row.current_page ?? 0), safeTotal);
   const percent =
     row.reading_status === 'finished'
       ? 100
-      : row.total_pages > 0
+      : (row.total_pages ?? 0) > 0
       ? Math.round((safeCurrent / safeTotal) * 100)
       : 0;
   return {
@@ -73,19 +64,12 @@ export function CurrentBookProvider({ children, userId }: { children: ReactNode;
   // Load from Supabase on mount / userId change
   useEffect(() => {
     async function load() {
-      const { data, error } = await supabase
-        .from('user_books')
-        .select('*')
-        .eq('user_id', userId)
-        .not('reading_status', 'is', null);
-
-      if (error) {
-        console.error('Failed to load books:', error);
+      const { rows, failed } = await loadUserBooks(userId);
+      if (failed) {
         setLoadError(true);
         return;
       }
 
-      const rows = data ?? [];
       // There should be one 'current' row, but older versions could leave several.
       // The most recently touched one wins; the others count as in progress if started.
       const currents = rows

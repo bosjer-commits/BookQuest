@@ -12,16 +12,11 @@ import { SKIN_CATALOG } from '@/data/skins';
 import { USERS } from '@/data/users';
 import { createClient } from '@/lib/supabase/client';
 import { onSaved } from '@/lib/saveError';
+import type { ShelfBook } from '@/lib/types';
 
 const KID_IDS = ['annalyn', 'elliott', 'robin', 'simon', 'oliver', 'lucas'];
 
-type BookItem = {
-  book: {
-    title: string;
-    author: string;
-  };
-  coverUrl?: string;
-};
+type BookItem = ShelfBook;
 
 type KidData = {
   id: string;
@@ -46,7 +41,9 @@ export default function FriendsPage() {
 
   const [kidsData, setKidsData] = useState<KidData[]>([]);
   const [activeFriendIndex, setActiveFriendIndex] = useState(0);
-  const [ownSkinIndex, setOwnSkinIndex] = useState(0);
+  // The skin saved in the database, and the one picked on this visit (if any).
+  const [savedSkinId, setSavedSkinId] = useState<string | null>(null);
+  const [chosenSkinIndex, setChosenSkinIndex] = useState<number | null>(null);
 
   // Only unlocked skins for the viewing user (for own showcase)
   const ownCatalogSkins = viewingProfile
@@ -57,6 +54,8 @@ export default function FriendsPage() {
       )
     : [];
   const ownSkinAssets = ownCatalogSkins.map((s) => s.asset);
+  const savedSkinIndex = ownCatalogSkins.findIndex((s) => s.id === savedSkinId);
+  const ownSkinIndex = chosenSkinIndex ?? Math.max(0, savedSkinIndex);
 
   // Load all kids' data from Supabase
   useEffect(() => {
@@ -64,8 +63,9 @@ export default function FriendsPage() {
       const [booksRes, skinsRes, stateRes] = await Promise.all([
         supabase
           .from('user_books')
-          .select('user_id, title, author, cover_url, reading_status, rating, favorited_at, is_favorite')
-          .in('user_id', KID_IDS),
+          .select('user_id, title, author, cover_url, rating')
+          .in('user_id', KID_IDS)
+          .eq('reading_status', 'finished'),
         supabase
           .from('unlocked_skins')
           .select('user_id, skin_id')
@@ -87,14 +87,9 @@ export default function FriendsPage() {
       const data: KidData[] = KID_IDS.map((id) => {
         const user = USERS.find((u) => u.id === id)!;
 
-        const userBooks = allBooks.filter((b) => b.user_id === id);
-        const finishedBooks = userBooks
-          .filter((b) => b.reading_status === 'finished')
+        const finishedBooks = allBooks
+          .filter((b) => b.user_id === id)
           .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
-        const inProgressBooks = userBooks.filter((b) => b.reading_status === 'in_progress');
-        const favorites = userBooks
-          .filter((b) => b.is_favorite && !b.reading_status)
-          .sort((a, b) => (b.favorited_at ?? 0) - (a.favorited_at ?? 0));
 
         // Display only finished books, max 3
         const books: BookItem[] = finishedBooks.slice(0, 3).map((item) => ({
@@ -135,32 +130,16 @@ export default function FriendsPage() {
       );
 
       setKidsData(data);
+      setSavedSkinId(
+        allState.find((s) => s.user_id === viewingUserId)?.selected_skin_id ?? null
+      );
     }
     loadFriends();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewingUserId]);
 
-  // Load own selected skin index on mount
-  useEffect(() => {
-    if (!viewingUserId || ownCatalogSkins.length === 0) return;
-    async function loadSelectedSkin() {
-      const { data } = await supabase
-        .from('user_state')
-        .select('selected_skin_id')
-        .eq('user_id', viewingUserId)
-        .single();
-      if (data?.selected_skin_id) {
-        const idx = ownCatalogSkins.findIndex((s) => s.id === data.selected_skin_id);
-        if (idx !== -1) setOwnSkinIndex(idx);
-      }
-    }
-    loadSelectedSkin();
-  // Re-run once the unlocked skins have loaded, or the saved choice is never restored.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [viewingUserId, ownCatalogSkins.length]);
-
   const handleOwnSkinChange = (index: number) => {
-    setOwnSkinIndex(index);
+    setChosenSkinIndex(index);
     if (viewingUserId && ownCatalogSkins[index]) {
       supabase
         .from('user_state')

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { searchBooks, BookSearchRateLimitError, type BookSearchItem } from '@/lib/googleBooks';
+import { GOLD, BLUE, BROWN, GOLD_OUTLINE } from '@/lib/theme';
 
 export interface PickedBook {
   title: string;
@@ -16,8 +17,6 @@ interface BookSearchModalProps {
   onPick: (book: PickedBook) => void;
 }
 
-const GOLD = '#F6D58A';
-const BLUE = '#74B9FF';
 
 export default function BookSearchModal({ onClose, onPick }: BookSearchModalProps) {
   const [query, setQuery] = useState('');
@@ -102,7 +101,7 @@ export default function BookSearchModal({ onClose, onPick }: BookSearchModalProp
           className="flex-1 text-lg font-bold brawl-text"
           style={{
             color: GOLD,
-            textShadow: '-2px 0 #5A3C12, 2px 0 #5A3C12, 0 -2px #5A3C12, 0 2px #5A3C12',
+            textShadow: GOLD_OUTLINE,
           }}
         >
           {manual ? 'Add a Book' : 'Find a Book'}
@@ -163,7 +162,7 @@ export default function BookSearchModal({ onClose, onPick }: BookSearchModalProp
             className="mt-2 rounded-full py-3 font-bold brawl-text"
             style={{
               background: 'linear-gradient(to bottom, #FDCB6E 0%, #F0A500 100%)',
-              color: '#5A3C12',
+              color: BROWN,
               opacity: mTitle.trim() ? 1 : 0.5,
             }}
           >

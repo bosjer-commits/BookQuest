@@ -1,12 +1,4 @@
-export interface Book {
-  year: number;
-  title: string;
-  author: string;
-  publisher?: string;
-  cover?: string;
-  summary?: string;
-  ageRange?: string;
-}
+import type { Book } from '@/lib/types';
 
 export const augustprisetWinners: Book[] = [
   { year: 1992, title: 'Jag saknar dig, jag saknar dig!', author: 'Peter Pohl & Kinna Gieth', publisher: 'Rabén & Sjögren', summary: 'En stark berättelse om sorg och saknad. En pojke försöker förstå sina känslor efter en stor förlust. Boken är allvarlig men väldigt mänsklig.', ageRange: '10–13', cover: '/covers/Augustpriset/jag-saknar-dig-jag-saknar-dig.jpeg' },

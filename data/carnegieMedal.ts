@@ -1,12 +1,4 @@
-export interface Book {
-  year: number;
-  title: string;
-  author: string;
-  publisher?: string;
-  cover?: string;
-  summary?: string;
-  ageRange?: string;
-}
+import type { Book } from '@/lib/types';
 
 export const carnegieMedalWinners: Book[] = [
   { year: 1936, title: 'Pigeon Post', author: 'Arthur Ransome', publisher: 'Jonathan Cape', cover: '/covers/Carnegie/Pigeon_Post.jpg', summary: 'Children spend the summer exploring hills and searching for gold. A classic adventure full of teamwork and outdoor spirit.', ageRange: '9–12' },

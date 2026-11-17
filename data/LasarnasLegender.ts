@@ -1,4 +1,4 @@
-import { Book } from './deGoudenGriffel';
+import type { Book } from '@/lib/types';
 
 export const lasarnasLegender: Book[] = [
   { year: 1997, title: 'Harry Potter och De vises sten', author: 'J.K. Rowling', ageRange: '9–12', summary: 'Harry får veta att han är en trollkarl och börjar på Hogwarts. Där möter han både vänskap och faror. Magisk, spännande och full av äventyr.', cover: '/covers/Lasarnas Legender/harry_potter_och_de_vises_sten.jpg' },

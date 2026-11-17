@@ -5,21 +5,13 @@ import { groteVriendelijke100 } from './groteVriendelijke';
 import { lasarnasLegender } from './LasarnasLegender';
 import { carnegieMedalWinners } from './carnegieMedal';
 import { newberyMedalWinners } from './newberyMedal';
+import type { Book } from '@/lib/types';
 
 export interface PrizeCategory {
   id: string;
   name: string;
   domeImage: string;
-  books: Array<{
-    year: number;
-    title: string;
-    author: string;
-    illustrator?: string;
-    publisher?: string;
-    cover?: string;
-    ageRange?: string;
-    summary?: string;
-  }>;
+  books: Book[];
 }
 
 export const prizeCategories: PrizeCategory[] = [

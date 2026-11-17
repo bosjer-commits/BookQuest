@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { BLACK_OUTLINE } from '@/lib/theme';
 
 interface BookDisplayProps {
   title: string;
@@ -78,7 +79,7 @@ export default function BookDisplay({
               className="text-white text-[20px] font-bold brawl-text relative top-[2px]"
               style={{
                 textShadow:
-                  '-2px 0 #000, 2px 0 #000, 0 -2px #000, 0 2px #000, -2px -2px #000, 2px -2px #000, -2px 2px #000, 2px 2px #000',
+                  BLACK_OUTLINE,
               }}
             >
               *
@@ -87,7 +88,7 @@ export default function BookDisplay({
               className="text-white text-[22px] font-bold brawl-text"
               style={{
                 textShadow:
-                  '-2px 0 #000, 2px 0 #000, 0 -2px #000, 0 2px #000, -2px -2px #000, 2px -2px #000, -2px 2px #000, 2px 2px #000',
+                  BLACK_OUTLINE,
               }}
             >
               {year}
@@ -96,7 +97,7 @@ export default function BookDisplay({
               className="text-white text-[20px] font-bold brawl-text relative top-[2px]"
               style={{
                 textShadow:
-                  '-2px 0 #000, 2px 0 #000, 0 -2px #000, 0 2px #000, -2px -2px #000, 2px -2px #000, -2px 2px #000, 2px 2px #000',
+                  BLACK_OUTLINE,
               }}
             >
               *

@@ -2,17 +2,9 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { loadUserBooks } from '@/lib/userBooks';
+import type { Book } from '@/lib/types';
 import { onSaved } from '@/lib/saveError';
-
-interface Book {
-  year: number;
-  title: string;
-  author: string;
-  illustrator?: string;
-  cover?: string;
-  summary?: string;
-  ageRange?: string;
-}
 
 interface FavoriteBook {
   book: Book;
@@ -39,21 +31,18 @@ export function FavoritesProvider({ children, userId }: { children: ReactNode; u
   // Load from Supabase on mount / userId change
   useEffect(() => {
     async function load() {
-      const { data, error } = await supabase
-        .from('user_books')
-        .select('title, author, cover_url, book_year, favorited_at')
-        .eq('user_id', userId)
-        .eq('is_favorite', true)
-        .order('favorited_at', { ascending: false });
-
-      if (error) {
-        console.error('Failed to load favorites:', error);
+      const { rows, failed } = await loadUserBooks(userId);
+      if (failed) {
         setLoadError(true);
         return;
       }
 
+      const favoriteRows = rows
+        .filter((row) => row.is_favorite)
+        .sort((a, b) => (b.favorited_at ?? 0) - (a.favorited_at ?? 0));
+
       setFavorites(
-        (data ?? []).map((row) => ({
+        favoriteRows.map((row) => ({
           book: { year: row.book_year ?? 0, title: row.title, author: row.author },
           coverUrl: row.cover_url ?? undefined,
           addedAt: row.favorited_at ?? Date.now(),

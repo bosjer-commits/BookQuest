@@ -1,12 +1,4 @@
-export interface Book {
-  year: number;
-  title: string;
-  author: string;
-  illustrator?: string;
-  cover?: string;
-  summary?: string;
-  ageRange?: string;
-}
+import type { Book } from '@/lib/types';
 
 export const deGoudenGriffelWinners: Book[] = [
   { year: 1971, title: 'De mare van de witte toren', author: 'Alet Schouten', summary: 'Een spannend verhaal over een geheimzinnige toren. Een groep kinderen raakt betrokken bij een mysterie. Het boek zit vol avontuur en een licht griezelige sfeer.', ageRange: '8–10', cover: '/covers/Gouden Griffel/de-mare-van-de-witte-toren.jpg' },

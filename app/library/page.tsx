@@ -15,6 +15,7 @@ import { getCoverOverrideByIsbn, getCoverOverrideByTitleAuthor } from '@/data/co
 import { useCurrentBook } from '@/contexts/CurrentBookContext';
 import { useFavorites } from '@/contexts/FavoritesContext';
 import { useUser } from '@/contexts/UserContext';
+import { GOLD, GOLD_OUTLINE } from '@/lib/theme';
 
 function LibraryContent() {
   const router = useRouter();
@@ -326,9 +327,9 @@ function LibraryContent() {
                   className="font-bold brawl-text w-full truncate"
                   style={{
                     fontSize: currentBook.title.length > 20 ? 'clamp(16px, 4vw, 22px)' : '26px',
-                    color: '#F6D58A',
+                    color: GOLD,
                     textShadow:
-                      '-2px 0 #5A3C12, 2px 0 #5A3C12, 0 -2px #5A3C12, 0 2px #5A3C12',
+                      GOLD_OUTLINE,
                   }}
                 >
                   {currentBook.title}

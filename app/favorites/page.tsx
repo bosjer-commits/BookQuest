@@ -6,15 +6,10 @@ import Image from 'next/image';
 import BottomNav from '@/components/BottomNav';
 import { useFavorites } from '@/contexts/FavoritesContext';
 import { useCurrentBook } from '@/contexts/CurrentBookContext';
+import type { ShelfBook } from '@/lib/types';
+import { GOLD, GOLD_OUTLINE } from '@/lib/theme';
 
-type BookItem = {
-  book: {
-    title: string;
-    author: string;
-    year?: number;
-  };
-  coverUrl?: string;
-};
+type BookItem = ShelfBook;
 
 function BookSlot({
   item,
@@ -103,9 +98,9 @@ function Section({
         <h2
           className="text-center text-[18px] font-bold brawl-text"
           style={{
-            color: '#F6D58A',
+            color: GOLD,
             textShadow:
-              '-2px 0 #5A3C12, 2px 0 #5A3C12, 0 -2px #5A3C12, 0 2px #5A3C12',
+              GOLD_OUTLINE,
           }}
         >
           {title}

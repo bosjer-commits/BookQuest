@@ -1,4 +1,4 @@
-import { Book } from './deGoudenGriffel';
+import type { Book } from '@/lib/types';
 
 export const groteVriendelijke100: Book[] = [
   { year: 2021, title: 'Films die nergens draaien', author: 'Yorick Goldewijk', ageRange: '10–13', summary: 'Een jongen ontdekt oude filmverhalen vol geheimen. Fantasie en werkelijkheid lopen door elkaar. Avontuurlijk en mysterieus.' },
