@@ -179,6 +179,7 @@ export default function CharacterShowcase({ skins, name, activeIndex, onIndexCha
             alt={name}
             width={1680}
             height={1680}
+            sizes="(max-width: 430px) 100vw, 430px"
             className="h-full w-auto object-contain"
             style={{
               animation: 'character-entrance 0.6s ease-out',

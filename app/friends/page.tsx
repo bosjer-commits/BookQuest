@@ -35,7 +35,7 @@ function getDefaultSkinAsset(ownerName: string): string {
   const skin = SKIN_CATALOG.find(
     (s) => s.owner.toLowerCase() === ownerName.toLowerCase()
   );
-  return skin?.asset ?? '/assets/Skins/Elliot/Legendary/ElliotSpike.png';
+  return skin?.asset ?? '/assets/Skins/Elliot/Legendary/ElliotSpike.webp';
 }
 
 export default function FriendsPage() {
@@ -193,7 +193,7 @@ export default function FriendsPage() {
         {/* Own character showcase */}
         <div className="relative">
           <CharacterShowcase
-            skins={ownSkinAssets.length > 0 ? ownSkinAssets : ['/assets/Skins/Elliot/Legendary/ElliotSpike.png']}
+            skins={ownSkinAssets.length > 0 ? ownSkinAssets : ['/assets/Skins/Elliot/Legendary/ElliotSpike.webp']}
             name={viewingProfile?.name ?? ''}
             activeIndex={ownSkinIndex}
             onIndexChange={handleOwnSkinChange}

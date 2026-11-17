@@ -40,7 +40,7 @@ export default function Home() {
 
   // Avatar image for floating user button
   const avatarSkin = viewingProfile
-    ? `/assets/Skins/${viewingProfile.name}_profile.png`
+    ? `/assets/Skins/${viewingProfile.name}_profile.webp`
     : null;
 
   return (

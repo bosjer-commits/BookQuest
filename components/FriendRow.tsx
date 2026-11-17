@@ -56,6 +56,7 @@ export default function FriendRow({ friend, books, onSelectBook }: FriendRowProp
             src={friend.skin}
             alt={friend.name}
             fill
+            sizes="135px"
             style={{ objectFit: 'contain', objectPosition: 'bottom' }}
           />
         </div>

@@ -58,6 +58,14 @@ export default function ChestOpeningModal({ isOpen, onClose, chestGoal }: ChestO
     }
   }, [isOpen]);
 
+  // Preload the opening animation for the current tier so it is ready before the
+  // timed reveal starts (the reveal runs on fixed timers, not on image load).
+  useEffect(() => {
+    if (!isOpen) return;
+    const img = new window.Image();
+    img.src = CHEST_TIERS[tier].openingAnimation;
+  }, [isOpen, tier]);
+
   // Auto-advance from upgrade3 → ready after flash
   useEffect(() => {
     if (phase === 'upgrade3') {

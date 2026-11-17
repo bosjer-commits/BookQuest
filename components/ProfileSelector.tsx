@@ -3,7 +3,7 @@
 import { useUser } from '@/contexts/UserContext';
 
 // Hotspot positions as percentages of the image (top, left, width, height).
-// Layout of newlandingpage.png — a 2x3 grid of profile cards:
+// Layout of newlandingpage.webp — a 2x3 grid of profile cards:
 //   Row 1: Annalyn, Lucas, Robin
 //   Row 2: Oliver, Elliot, Simon
 const HOTSPOTS: { id: string; top: number; left: number; width: number; height: number }[] = [
@@ -27,7 +27,7 @@ export default function ProfileSelector() {
     >
       <div className="relative w-full h-full max-w-[500px] mx-auto">
         <img
-          src="/assets/newlandingpage.png"
+          src="/assets/newlandingpage.webp"
           alt="Book Quest - Select your profile"
           className="w-full h-full object-contain"
         />
