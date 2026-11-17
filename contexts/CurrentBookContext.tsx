@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { loadUserBooks } from '@/lib/userBooks';
+import { findCover } from '@/lib/googleBooks';
 import type { Book, UserBookRow } from '@/lib/types';
 import { onSaved } from '@/lib/saveError';
 
@@ -21,6 +22,8 @@ interface CurrentBookContextType {
   finishedBooks: CurrentBookData[];
   /** Returns false when the book was not started because it is already finished. */
   setCurrentBook: (book: Book, coverUrl?: string, totalPages?: number) => boolean;
+  /** Sets the cover of a book the user has (current, in progress or finished). */
+  setBookCover: (bookTitle: string, coverUrl: string) => void;
   updateProgress: (progress: number) => void;
   updateReadingProgress: (currentPage: number, totalPages: number) => void;
   updateRating: (rating: number) => void;
@@ -90,6 +93,21 @@ export function CurrentBookProvider({ children, userId }: { children: ReactNode;
     load();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
+
+  const setBookCover = (bookTitle: string, coverUrl: string) => {
+    const withCover = (b: CurrentBookData) =>
+      b.book.title === bookTitle ? { ...b, coverUrl } : b;
+    setCurrentBookState((prev) => (prev ? withCover(prev) : prev));
+    setInProgressBooks((prev) => prev.map(withCover));
+    setFinishedBooks((prev) => prev.map(withCover));
+
+    supabase
+      .from('user_books')
+      .update({ cover_url: coverUrl })
+      .eq('user_id', userId)
+      .eq('title', bookTitle)
+      .then(onSaved('cover'));
+  };
 
   const setCurrentBook = (book: Book, coverUrl?: string, totalPages?: number) => {
     // Already the current book: nothing to do.
@@ -173,6 +191,14 @@ export function CurrentBookProvider({ children, userId }: { children: ReactNode;
         { onConflict: 'user_id,title' }
       )
       .then(onSaved('book'));
+
+    // Added without a cover (typed in by hand, or the search had no image):
+    // look for one in the background and fill it in when found.
+    if (!coverUrl) {
+      findCover(book.title, book.author)
+        .then((url) => { if (url) setBookCover(book.title, url); })
+        .catch((error) => console.warn('Cover lookup failed:', error));
+    }
     return true;
   };
 
@@ -329,6 +355,7 @@ export function CurrentBookProvider({ children, userId }: { children: ReactNode;
         inProgressBooks,
         finishedBooks,
         setCurrentBook,
+        setBookCover,
         updateProgress,
         updateReadingProgress,
         updateRating,

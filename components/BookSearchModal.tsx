@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { searchBooks, BookSearchRateLimitError, type BookSearchItem } from '@/lib/googleBooks';
+import { searchBooks, findOpenLibraryCover, BookSearchRateLimitError, type BookSearchItem } from '@/lib/googleBooks';
 import { GOLD, BLUE, BROWN, GOLD_OUTLINE } from '@/lib/theme';
 
 export interface PickedBook {
@@ -51,6 +51,15 @@ export default function BookSearchModal({ onClose, onPick }: BookSearchModalProp
         if (seq !== reqSeqRef.current) return; // a newer search superseded this one
         setResults(items);
         setErrorMsg(null);
+        // Google often has no image. Look those up at Open Library in the background
+        // and drop each cover into the list as it arrives.
+        items.forEach((item) => {
+          if (item.coverUrl) return;
+          findOpenLibraryCover(item.title, item.author, item.isbn).then((url) => {
+            if (!url || seq !== reqSeqRef.current) return;
+            setResults((prev) => prev.map((r) => (r === item ? { ...r, coverUrl: url } : r)));
+          });
+        });
       } catch (e) {
         if (seq !== reqSeqRef.current) return;
         setResults([]);
@@ -71,7 +80,9 @@ export default function BookSearchModal({ onClose, onPick }: BookSearchModalProp
     };
   }, [query]);
 
-  const pickResult = (item: BookSearchItem) => {
+  const pickResult = (picked: BookSearchItem) => {
+    // Use the latest copy of the row, which may have gained a cover since it was drawn.
+    const item = results.find((r) => r.title === picked.title && r.author === picked.author) ?? picked;
     onPick({
       title: item.title,
       author: item.author,

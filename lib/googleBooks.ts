@@ -16,6 +16,7 @@ export interface GoogleBookResult {
 
 interface OpenLibrarySearchResult {
   docs?: Array<{
+    title?: string;
     cover_i?: number;
     isbn?: string[];
   }>;
@@ -107,6 +108,7 @@ export interface BookSearchItem {
   description?: string;
   year: number;
   totalPages: number;
+  isbn?: string;
 }
 
 // Raised by callers to distinguish "quota exceeded" from "no results".
@@ -119,7 +121,7 @@ export class BookSearchRateLimitError extends Error {
 
 function parseVolumes(data: { items?: unknown[] }): BookSearchItem[] {
   const items = Array.isArray(data.items) ? data.items : [];
-  const seen = new Set<string>();
+  const byKey = new Map<string, BookSearchItem>();
   const results: BookSearchItem[] = [];
 
   for (const raw of items) {
@@ -129,8 +131,6 @@ function parseVolumes(data: { items?: unknown[] }): BookSearchItem[] {
 
     const author = ((info.authors as string[] | undefined) ?? []).join(', ') || 'Unknown';
     const key = `${title.toLowerCase()}|${author.toLowerCase()}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
 
     const imageLinks = info.imageLinks as { thumbnail?: string; smallThumbnail?: string } | undefined;
     let cover: string | null = imageLinks?.thumbnail || imageLinks?.smallThumbnail || null;
@@ -141,14 +141,29 @@ function parseVolumes(data: { items?: unknown[] }): BookSearchItem[] {
     const published = info.publishedDate as string | undefined;
     const year = published ? parseInt(String(published).slice(0, 4), 10) || 0 : 0;
 
-    results.push({
-      title,
-      author,
-      coverUrl: cover,
-      description: info.description as string | undefined,
-      year,
-      totalPages: (info.pageCount as number | undefined) ?? 0,
-    });
+    const identifiers =
+      (info.industryIdentifiers as { type?: string; identifier?: string }[] | undefined) ?? [];
+    const isbn =
+      identifiers.find((i) => i.type === 'ISBN_13')?.identifier ??
+      identifiers.find((i) => i.type === 'ISBN_10')?.identifier;
+    const description = info.description as string | undefined;
+    const totalPages = (info.pageCount as number | undefined) ?? 0;
+
+    // The same book often comes back as several editions. Keep one entry, but let a
+    // later edition fill in whatever the first one lacked (most importantly the cover).
+    const existing = byKey.get(key);
+    if (existing) {
+      if (!existing.coverUrl && cover) existing.coverUrl = cover;
+      if (!existing.isbn && isbn) existing.isbn = isbn;
+      if (!existing.totalPages && totalPages) existing.totalPages = totalPages;
+      if (!existing.description && description) existing.description = description;
+      if (!existing.year && year) existing.year = year;
+      continue;
+    }
+
+    const item: BookSearchItem = { title, author, coverUrl: cover, description, year, totalPages, isbn };
+    byKey.set(key, item);
+    results.push(item);
   }
 
   return results;
@@ -306,4 +321,88 @@ export async function fetchOpenLibraryCover(
     console.error('Open Library cover fetch failed:', error);
     return null;
   }
+}
+
+// Loads the image in the browser to see whether it really exists. Unlike fetch(),
+// this is not subject to CORS, so it works for any cover host.
+function imageLoads(url: string, timeoutMs = 6000): Promise<boolean> {
+  if (typeof window === 'undefined') return Promise.resolve(false);
+  return new Promise((resolve) => {
+    const img = new window.Image();
+    const timer = setTimeout(() => resolve(false), timeoutMs);
+    img.onload = () => {
+      clearTimeout(timer);
+      resolve(img.naturalWidth > 1);
+    };
+    img.onerror = () => {
+      clearTimeout(timer);
+      resolve(false);
+    };
+    img.src = url;
+  });
+}
+
+// "The Hobbit: Or There and Back Again" and "the hobbit" should count as the same book.
+function normalizeTitle(title: string): string {
+  return title
+    .toLowerCase()
+    .split(/[:(\u2013\u2014]/)[0]
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+function sameTitle(a: string | undefined, b: string): boolean {
+  if (!a) return false;
+  const x = normalizeTitle(a);
+  const y = normalizeTitle(b);
+  return x.length > 0 && x === y;
+}
+
+const hasRealAuthor = (author: string) => {
+  const a = author.trim().toLowerCase();
+  return a.length > 0 && a !== 'unknown';
+};
+
+// Open Library cover for a book Google had no image for. Tries the ISBN first, then
+// a title (+ author) search. Only accepts a search hit whose title really matches,
+// so a kid doesn't end up with some other book's cover.
+export async function findOpenLibraryCover(
+  title: string,
+  author: string,
+  isbn?: string
+): Promise<string | null> {
+  try {
+    if (isbn) {
+      // default=false makes Open Library answer 404 instead of a blank placeholder.
+      const isbnUrl = `https://covers.openlibrary.org/b/isbn/${normalizeIsbn(isbn)}-L.jpg?default=false`;
+      if (await imageLoads(isbnUrl)) return isbnUrl;
+    }
+
+    const params = new URLSearchParams({ title, limit: '10', fields: 'title,cover_i' });
+    if (hasRealAuthor(author)) params.set('author', author.split(',')[0].trim());
+    const response = await fetch(`https://openlibrary.org/search.json?${params.toString()}`);
+    if (!response.ok) return null;
+
+    const data = (await response.json()) as OpenLibrarySearchResult;
+    const match = data.docs?.find((d) => d.cover_i && sameTitle(d.title, title));
+    return match ? `https://covers.openlibrary.org/b/id/${match.cover_i}-L.jpg` : null;
+  } catch (error) {
+    console.warn('Open Library cover lookup failed:', error);
+    return null;
+  }
+}
+
+// Best-effort cover for a book that was added without one (typed in by hand, or a
+// search result with no image). Returns null when nothing trustworthy is found.
+export async function findCover(title: string, author: string): Promise<string | null> {
+  if (hasRealAuthor(author)) {
+    const result = await searchBook(title, author);
+    if (result && sameTitle(result.title, title)) {
+      const url = getBookCoverUrl(result);
+      if (url) return url;
+    }
+  }
+  return findOpenLibraryCover(title, author);
 }
