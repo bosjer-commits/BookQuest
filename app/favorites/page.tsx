@@ -11,6 +11,7 @@ type BookItem = {
   book: {
     title: string;
     author: string;
+    year?: number;
   };
   coverUrl?: string;
 };
@@ -143,9 +144,10 @@ export default function FavoritesPage() {
   const { inProgressBooks, finishedBooks } = useCurrentBook();
 
   const handleSelect = (item: BookItem) => {
-    const title = encodeURIComponent(item.book.title);
-    const author = encodeURIComponent(item.book.author);
-    router.push(`/library?title=${title}&author=${author}`);
+    const params = new URLSearchParams({ title: item.book.title, author: item.book.author });
+    if (item.coverUrl) params.set('cover', item.coverUrl);
+    if (item.book.year) params.set('year', String(item.book.year));
+    router.push(`/library?${params.toString()}`);
   };
 
   return (

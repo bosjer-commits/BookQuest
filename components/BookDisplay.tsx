@@ -69,10 +69,10 @@ export default function BookDisplay({
             }}
           />
 
-          {/* Year text at bottom of frame */}
+          {/* Year text at bottom of frame (hidden when the year is unknown) */}
           <div
             className="absolute left-0 right-0 flex items-center justify-center gap-2"
-            style={{ bottom: '-4px', zIndex: 3 }}
+            style={{ bottom: '-4px', zIndex: 3, visibility: year > 0 ? 'visible' : 'hidden' }}
           >
             <span
               className="text-white text-[20px] font-bold brawl-text relative top-[2px]"

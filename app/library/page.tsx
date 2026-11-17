@@ -9,7 +9,7 @@ import CategorySelector from '@/components/CategorySelector';
 import BookDisplay from '@/components/BookDisplay';
 import BookInfoSection from '@/components/BookInfoSection';
 import BookSearchModal, { type PickedBook } from '@/components/BookSearchModal';
-import { prizeCategories } from '@/data/categories';
+import { prizeCategories, type PrizeCategory } from '@/data/categories';
 import { searchBook, getBookCoverUrl, fetchOpenLibraryCover } from '@/lib/googleBooks';
 import { getCoverOverrideByIsbn, getCoverOverrideByTitleAuthor } from '@/data/coverOverrides';
 import { useCurrentBook } from '@/contexts/CurrentBookContext';
@@ -20,7 +20,7 @@ function LibraryContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const didInitFromQuery = useRef(false);
-  const { setCurrentBook } = useCurrentBook();
+  const { setCurrentBook, finishedBooks } = useCurrentBook();
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
   const { canEditProgress, basePath } = useUser();
   const [categoryIndex, setCategoryIndex] = useState(0);
@@ -33,21 +33,31 @@ function LibraryContent() {
   const coverCacheKey = 'bookquest_cover_cache_v1';
   const coverCacheTtlMs = 90 * 24 * 60 * 60 * 1000;
 
+  // A book opened from Favorites/Friends that isn't in any award list.
+  const [customBook, setCustomBook] = useState<PrizeCategory['books'][number] | null>(null);
+
   const currentCategory = prizeCategories[categoryIndex];
-  const currentBook = currentCategory.books[bookIndex];
+  const currentBook = customBook ?? currentCategory.books[bookIndex];
+  const isFinished = finishedBooks.some((b) => b.book.title === currentBook.title);
 
   const handleStartReading = () => {
-    setCurrentBook(currentBook, coverUrl || undefined);
+    if (setCurrentBook(currentBook, coverUrl || undefined) === false) return;
     router.push(basePath || '/');
   };
 
   const handlePickSearchResult = (book: PickedBook) => {
-    setCurrentBook(
+    const started = setCurrentBook(
       { year: book.year, title: book.title, author: book.author },
       book.coverUrl,
       book.totalPages
     );
     setShowSearch(false);
+    if (started === false) {
+      // Already finished: show it (marked Finished) instead of restarting it.
+      setCustomBook({ year: book.year, title: book.title, author: book.author, cover: book.coverUrl });
+      setShowInfo(true);
+      return;
+    }
     router.push(basePath || '/');
   };
 
@@ -165,8 +175,10 @@ function LibraryContent() {
     const author = searchParams.get('author');
     if (!title || !author) return;
 
-    const decodedTitle = decodeURIComponent(title);
-    const decodedAuthor = decodeURIComponent(author);
+    // searchParams.get() already decodes; decoding again breaks titles containing '%'.
+    const decodedTitle = title;
+    const decodedAuthor = author;
+    didInitFromQuery.current = true;
 
     for (let i = 0; i < prizeCategories.length; i += 1) {
       const bookIdx = prizeCategories[i].books.findIndex(
@@ -177,27 +189,39 @@ function LibraryContent() {
       if (bookIdx !== -1) {
         setCategoryIndex(i);
         setBookIndex(bookIdx);
-        didInitFromQuery.current = true;
-        break;
+        return;
       }
     }
+
+    // Not an award book (added via search or by hand): show it on its own.
+    const year = parseInt(searchParams.get('year') ?? '', 10);
+    setCustomBook({
+      year: Number.isNaN(year) ? 0 : year,
+      title: decodedTitle,
+      author: decodedAuthor,
+      cover: searchParams.get('cover') || undefined,
+    });
   }, [searchParams]);
 
   const nextCategory = () => {
+    setCustomBook(null);
     setCategoryIndex((prev) => (prev + 1) % prizeCategories.length);
     setBookIndex(0);
   };
 
   const prevCategory = () => {
+    setCustomBook(null);
     setCategoryIndex((prev) => (prev - 1 + prizeCategories.length) % prizeCategories.length);
     setBookIndex(0);
   };
 
   const nextBook = () => {
+    setCustomBook(null);
     setBookIndex((prev) => (prev + 1) % currentCategory.books.length);
   };
 
   const prevBook = () => {
+    setCustomBook(null);
     setBookIndex((prev) => (prev - 1 + currentCategory.books.length) % currentCategory.books.length);
   };
 
@@ -312,7 +336,7 @@ function LibraryContent() {
 
                 <div className="mt-3 space-y-1 text-[16px] font-bold text-[#F6D58A] brawl-text w-full">
                   <div className="truncate">Author: {currentBook.author}</div>
-                  <div>Year: {currentBook.year}</div>
+                  {currentBook.year > 0 && <div>Year: {currentBook.year}</div>}
                   {currentBook.ageRange && <div>Age Range: {currentBook.ageRange}</div>}
                 </div>
 
@@ -339,7 +363,12 @@ function LibraryContent() {
               </div>
 
               {canEditProgress && (
-                <button onClick={handleStartReading} className="mt-4 w-[200px] relative">
+                <button
+                  onClick={handleStartReading}
+                  disabled={isFinished}
+                  className="mt-4 w-[200px] relative"
+                  style={{ opacity: isFinished ? 0.6 : 1 }}
+                >
                   <Image
                     src="/assets/start.png"
                     alt="Start Reading"
@@ -348,7 +377,7 @@ function LibraryContent() {
                     className="w-full h-auto"
                   />
                   <span className="absolute inset-0 flex items-center justify-center text-[18px] font-bold text-[#5A3C12]">
-                    Read
+                    {isFinished ? 'Finished' : 'Read'}
                   </span>
                 </button>
               )}

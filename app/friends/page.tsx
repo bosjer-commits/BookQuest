@@ -11,6 +11,7 @@ import { useChest } from '@/contexts/ChestContext';
 import { SKIN_CATALOG } from '@/data/skins';
 import { USERS } from '@/data/users';
 import { createClient } from '@/lib/supabase/client';
+import { onSaved } from '@/lib/saveError';
 
 const KID_IDS = ['annalyn', 'elliott', 'robin', 'simon', 'oliver', 'lucas'];
 
@@ -154,8 +155,9 @@ export default function FriendsPage() {
       }
     }
     loadSelectedSkin();
+  // Re-run once the unlocked skins have loaded, or the saved choice is never restored.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [viewingUserId]);
+  }, [viewingUserId, ownCatalogSkins.length]);
 
   const handleOwnSkinChange = (index: number) => {
     setOwnSkinIndex(index);
@@ -166,7 +168,7 @@ export default function FriendsPage() {
           { user_id: viewingUserId, selected_skin_id: ownCatalogSkins[index].id },
           { onConflict: 'user_id' }
         )
-        .then(({ error }) => { if (error) console.error(error); });
+        .then(onSaved('skin choice'));
     }
   };
 
@@ -176,9 +178,9 @@ export default function FriendsPage() {
   const currentFriend = friendsList[safeIndex];
 
   const handleSelectBook = (item: BookItem) => {
-    const title = encodeURIComponent(item.book.title);
-    const author = encodeURIComponent(item.book.author);
-    router.push(`/library?title=${title}&author=${author}`);
+    const params = new URLSearchParams({ title: item.book.title, author: item.book.author });
+    if (item.coverUrl) params.set('cover', item.coverUrl);
+    router.push(`/library?${params.toString()}`);
   };
 
   // Leaderboard rank for viewing user

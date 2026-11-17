@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { onSaved } from '@/lib/saveError';
 
 interface Book {
   year: number;
@@ -87,9 +88,7 @@ export function FavoritesProvider({ children, userId }: { children: ReactNode; u
         },
         { onConflict: 'user_id,title' }
       )
-      .then(({ error }) => {
-        if (error) console.error('Failed to save favorite:', error);
-      });
+      .then(onSaved('favorite'));
   };
 
   const removeFavorite = (bookTitle: string) => {
@@ -102,9 +101,7 @@ export function FavoritesProvider({ children, userId }: { children: ReactNode; u
       .update({ is_favorite: false, favorited_at: null })
       .eq('user_id', userId)
       .eq('title', bookTitle)
-      .then(({ error }) => {
-        if (error) console.error('Failed to remove favorite:', error);
-      });
+      .then(onSaved('favorite'));
   };
 
   const isFavorite = (bookTitle: string) => {

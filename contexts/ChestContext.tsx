@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { onSaved } from '@/lib/saveError';
 
 interface ChestContextType {
   unlockedSkins: string[];
@@ -62,7 +63,7 @@ export function ChestProvider({ children, userId }: { children: ReactNode; userI
       supabase
         .from('unlocked_skins')
         .upsert({ user_id: userId, skin_id: skinId }, { onConflict: 'user_id,skin_id' })
-        .then(({ error }) => { if (error) console.error('Failed to save skin:', error); });
+        .then(onSaved('skin'));
     },
     [userId, supabase]
   );
@@ -79,7 +80,7 @@ export function ChestProvider({ children, userId }: { children: ReactNode; userI
       supabase
         .from('collected_chests')
         .upsert({ user_id: userId, chest_goal: goal }, { onConflict: 'user_id,chest_goal' })
-        .then(({ error }) => { if (error) console.error('Failed to save chest:', error); });
+        .then(onSaved('chest'));
     },
     [userId, supabase]
   );

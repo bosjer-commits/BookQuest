@@ -10,6 +10,8 @@ import { ChestProvider, useChest } from '@/contexts/ChestContext';
 import ProfileSelector from '@/components/ProfileSelector';
 import ChestOpeningModal from '@/components/ChestOpeningModal';
 import { createClient } from '@/lib/supabase/client';
+import { onSaved } from '@/lib/saveError';
+import SaveErrorToast from '@/components/SaveErrorToast';
 
 type WelcomeStep = 'checking' | 'welcome' | 'chest' | 'done' | 'offline';
 
@@ -70,7 +72,7 @@ function WelcomeFlow({ userId, children }: { userId: string; children: ReactNode
     supabase
       .from('user_state')
       .upsert({ user_id: userId, welcomed: true }, { onConflict: 'user_id' })
-      .then(({ error }) => { if (error) console.error('Failed to save welcomed state:', error); });
+      .then(onSaved('welcomed state'));
     setStep('done');
   };
 
@@ -135,6 +137,7 @@ export default function UserDataProviders({ children }: { children: ReactNode })
     <CurrentBookProvider key={viewingUserId} userId={viewingUserId}>
       <FavoritesProvider key={viewingUserId} userId={viewingUserId}>
         <ChestProvider key={viewingUserId} userId={viewingUserId}>
+          <SaveErrorToast />
           <WelcomeFlow key={viewingUserId} userId={viewingUserId}>
             {children}
           </WelcomeFlow>

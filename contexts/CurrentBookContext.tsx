@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { onSaved } from '@/lib/saveError';
 
 interface Book {
   year: number;
@@ -26,7 +27,8 @@ interface CurrentBookContextType {
   currentBook: CurrentBookData | null;
   inProgressBooks: CurrentBookData[];
   finishedBooks: CurrentBookData[];
-  setCurrentBook: (book: Book, coverUrl?: string, totalPages?: number) => void;
+  /** Returns false when the book was not started because it is already finished. */
+  setCurrentBook: (book: Book, coverUrl?: string, totalPages?: number) => boolean | void;
   updateProgress: (progress: number) => void;
   updateReadingProgress: (currentPage: number, totalPages: number) => void;
   updateRating: (rating: number) => void;
@@ -83,9 +85,19 @@ export function CurrentBookProvider({ children, userId }: { children: ReactNode;
         return;
       }
 
-      const current = data?.find((r) => r.reading_status === 'current');
-      const inProgress = data?.filter((r) => r.reading_status === 'in_progress') ?? [];
-      const finished = data?.filter((r) => r.reading_status === 'finished') ?? [];
+      const rows = data ?? [];
+      // There should be one 'current' row, but older versions could leave several.
+      // The most recently touched one wins; the others count as in progress if started.
+      const currents = rows
+        .filter((r) => r.reading_status === 'current')
+        .sort((a, b) => (Date.parse(b.updated_at) || 0) - (Date.parse(a.updated_at) || 0));
+      const current = currents[0];
+      const strayCurrents = currents.slice(1).filter((r) => (r.current_page ?? 0) > 0);
+      const inProgress = [
+        ...rows.filter((r) => r.reading_status === 'in_progress'),
+        ...strayCurrents,
+      ];
+      const finished = rows.filter((r) => r.reading_status === 'finished');
 
       setCurrentBookState(current ? rowToBookData(current) : null);
       setInProgressBooks(inProgress.map(rowToBookData));
@@ -96,29 +108,57 @@ export function CurrentBookProvider({ children, userId }: { children: ReactNode;
   }, [userId]);
 
   const setCurrentBook = (book: Book, coverUrl?: string, totalPages?: number) => {
+    // Already the current book: nothing to do.
+    if (currentBook?.book.title === book.title) return true;
+    // A finished book stays finished. Restarting it would overwrite its pages and
+    // rating and take it off the finished shelf (lowering the chest count).
+    if (finishedBooks.some((b) => b.book.title === book.title)) return false;
+
     const initialTotal = totalPages && totalPages > 0 ? totalPages : 0;
-    // Move old current book to in-progress (if it had progress)
-    if (currentBook && currentBook.progress > 0) {
-      setInProgressBooks((prev) => {
-        const exists = prev.some((b) => b.book.title === currentBook.book.title);
-        if (exists) {
-          return prev.map((b) =>
-            b.book.title === currentBook.book.title ? currentBook : b
-          );
-        }
-        return [...prev, currentBook];
-      });
-      // Sync old current → in_progress in DB
+    const now = new Date().toISOString();
+    const previous = currentBook;
+    const previousStarted = Boolean(previous && (previous.currentPage ?? 0) > 0);
+    const resumed = inProgressBooks.find((b) => b.book.title === book.title);
+
+    // The old current book moves to in-progress if it was started, otherwise it is
+    // dropped. The new book leaves in-progress (it's becoming current).
+    setInProgressBooks((prev) => {
+      let next = prev.filter((b) => b.book.title !== book.title);
+      if (previous && previousStarted) {
+        next = [...next.filter((b) => b.book.title !== previous.book.title), previous];
+      }
+      return next;
+    });
+
+    // Same in the DB, for every other 'current' row so there is only ever one.
+    supabase
+      .from('user_books')
+      .update({ reading_status: 'in_progress', updated_at: now })
+      .eq('user_id', userId)
+      .eq('reading_status', 'current')
+      .neq('title', book.title)
+      .gt('current_page', 0)
+      .then(onSaved('book'));
+    supabase
+      .from('user_books')
+      .update({ reading_status: null, updated_at: now })
+      .eq('user_id', userId)
+      .eq('reading_status', 'current')
+      .neq('title', book.title)
+      .lte('current_page', 0)
+      .then(onSaved('book'));
+
+    // Picking up a book that was in progress: keep its pages and rating.
+    if (resumed) {
+      setCurrentBookState(resumed);
       supabase
         .from('user_books')
-        .update({ reading_status: 'in_progress', updated_at: new Date().toISOString() })
+        .update({ reading_status: 'current', updated_at: now })
         .eq('user_id', userId)
-        .eq('title', currentBook.book.title)
-        .then(({ error }) => { if (error) console.error(error); });
+        .eq('title', book.title)
+        .then(onSaved('book'));
+      return true;
     }
-
-    // Remove new book from in-progress state (it's becoming current)
-    setInProgressBooks((prev) => prev.filter((b) => b.book.title !== book.title));
 
     const newBook: CurrentBookData = {
       book,
@@ -144,11 +184,12 @@ export function CurrentBookProvider({ children, userId }: { children: ReactNode;
           current_page: 0,
           total_pages: initialTotal,
           rating: 0,
-          updated_at: new Date().toISOString(),
+          updated_at: now,
         },
         { onConflict: 'user_id,title' }
       )
-      .then(({ error }) => { if (error) console.error(error); });
+      .then(onSaved('book'));
+    return true;
   };
 
   const updateProgress = (progress: number) => {
@@ -180,7 +221,7 @@ export function CurrentBookProvider({ children, userId }: { children: ReactNode;
       })
       .eq('user_id', userId)
       .eq('title', currentBook.book.title)
-      .then(({ error }) => { if (error) console.error(error); });
+      .then(onSaved('book'));
   };
 
   const updateRating = (rating: number) => {
@@ -193,7 +234,7 @@ export function CurrentBookProvider({ children, userId }: { children: ReactNode;
       .update({ rating: safeRating, updated_at: new Date().toISOString() })
       .eq('user_id', userId)
       .eq('title', currentBook.book.title)
-      .then(({ error }) => { if (error) console.error(error); });
+      .then(onSaved('book'));
   };
 
   const finishCurrentBook = (currentPage?: number, totalPages?: number, rating?: number) => {
@@ -250,7 +291,7 @@ export function CurrentBookProvider({ children, userId }: { children: ReactNode;
         },
         { onConflict: 'user_id,title' }
       )
-      .then(({ error }) => { if (error) console.error(error); });
+      .then(onSaved('book'));
   };
 
   const clearCurrentBook = () => {
@@ -270,7 +311,7 @@ export function CurrentBookProvider({ children, userId }: { children: ReactNode;
         .update({ reading_status: 'finished', updated_at: new Date().toISOString() })
         .eq('user_id', userId)
         .eq('title', currentBook.book.title)
-        .then(({ error }) => { if (error) console.error(error); });
+        .then(onSaved('book'));
     }
     setCurrentBookState(null);
   };
@@ -283,7 +324,7 @@ export function CurrentBookProvider({ children, userId }: { children: ReactNode;
       .update({ reading_status: null, updated_at: new Date().toISOString() })
       .eq('user_id', userId)
       .eq('title', bookTitle)
-      .then(({ error }) => { if (error) console.error(error); });
+      .then(onSaved('book'));
   };
 
   const removeFinishedBook = (bookTitle: string) => {
@@ -294,7 +335,7 @@ export function CurrentBookProvider({ children, userId }: { children: ReactNode;
       .update({ reading_status: null, updated_at: new Date().toISOString() })
       .eq('user_id', userId)
       .eq('title', bookTitle)
-      .then(({ error }) => { if (error) console.error(error); });
+      .then(onSaved('book'));
   };
 
   return (
