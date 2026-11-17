@@ -7,7 +7,7 @@ type CoverOverrides = {
 
 const coverOverrides: CoverOverrides = {
   byTitleAuthor: {
-    'de mare van de witte toren|alet schouten': '/covers/de-mare-van-de-witte-toren.jpg',
+    'de mare van de witte toren|alet schouten': '/covers/Gouden Griffel/de-mare-van-de-witte-toren.jpg',
   },
   byIsbn: {
     // '9780123456789': '/covers/example.jpg',

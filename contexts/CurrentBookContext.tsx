@@ -28,7 +28,7 @@ interface CurrentBookContextType {
   inProgressBooks: CurrentBookData[];
   finishedBooks: CurrentBookData[];
   /** Returns false when the book was not started because it is already finished. */
-  setCurrentBook: (book: Book, coverUrl?: string, totalPages?: number) => boolean | void;
+  setCurrentBook: (book: Book, coverUrl?: string, totalPages?: number) => boolean;
   updateProgress: (progress: number) => void;
   updateReadingProgress: (currentPage: number, totalPages: number) => void;
   updateRating: (rating: number) => void;

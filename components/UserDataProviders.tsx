@@ -1,7 +1,6 @@
 'use client';
 
 import { ReactNode, useState, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
 import { useUser } from '@/contexts/UserContext';
 import { CHEST_TIERS } from '@/data/skins';
 import { CurrentBookProvider, useCurrentBook } from '@/contexts/CurrentBookContext';
@@ -127,10 +126,6 @@ function WelcomeFlow({ userId, children }: { userId: string; children: ReactNode
 
 export default function UserDataProviders({ children }: { children: ReactNode }) {
   const { activeUserId, viewingUserId } = useUser();
-  const pathname = usePathname();
-
-  if (pathname.startsWith('/test')) return <>{children}</>;
-
   if (!activeUserId || !viewingUserId) return <ProfileSelector />;
 
   return (

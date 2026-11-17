@@ -77,7 +77,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
 
 1. Go to your Supabase project
 2. Open SQL Editor
-3. Copy the entire contents of `database-schema.sql`
+3. Copy the entire contents of `supabase/schema.sql`
 4. Paste and run in SQL Editor
 5. Verify tables were created in Table Editor
 
@@ -115,7 +115,7 @@ bookquest/
 │   ├── supabase/           # Supabase client utilities
 │   ├── types.ts            # TypeScript types
 │   └── google-books.ts     # Google Books API
-└── database-schema.sql     # Database setup
+└── supabase/schema.sql     # Database setup
 ```
 
 ---
